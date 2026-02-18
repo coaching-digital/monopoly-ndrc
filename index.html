@@ -1224,7 +1224,7 @@ window.negoStep3 = (att, def, pos) => {
 
 
 
- window.showRecap = (i) => {
+window.showRecap = (i) => {
   // Si liquidation active : clic sur une entreprise = tentative de vente
   if (window.liquidationMode && window.currentTurn === window.liquidationTeamIdx) {
     return window.handleLiquidationCaseClick(i);
