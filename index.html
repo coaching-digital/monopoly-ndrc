@@ -817,10 +817,20 @@ window.finishGame = () => {
 
     const data = boardData[team.pos];
     if (data.name === "POLICE") {
-      team.pos = 10; team.prison = 1; window.updatePawnVisual(idx, 10);
-      window.openModal("👮 POLICE", `<p style="font-size:1.5rem;color:red;font-weight:900">FRAUDE ! Direction prison.</p><button class="btn-action" style="background:var(--rouge)" onclick="window.nextTurn()">OK</button>`);
-    } else if (data.type === 'commu') {
-      else if (data.name === "PARC") {
+  team.pos = 10;
+  team.prison = 1;
+  window.updatePawnVisual(idx, 10);
+
+  window.openModal(
+    "👮 POLICE",
+    `<p style="font-size:1.5rem;color:red;font-weight:900">
+      FRAUDE ! Direction prison.
+     </p>
+     <button class="btn-action" style="background:var(--rouge)" onclick="window.nextTurn()">OK</button>`
+  );
+
+} else if (data.name === "PARC") {
+
   const gain = window.communityPot;
   window.communityPot = 0;
   window.teams[idx].capital += gain;
@@ -835,7 +845,45 @@ window.finishGame = () => {
      </div>
      <button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">OK</button>`
   );
+
+} else if (data.type === 'commu') {
+
+  const cards = [
+    { m: "Aide de l'État", val: 200 },
+    { m: "Dividendes (15%)", val: 300 },
+    { m: "Amende URSSAF", val: -200 },
+    { m: "Taxes", val: -100 }
+  ];
+
+  const c = cards[Math.floor(Math.random() * cards.length)];
+
+  team.capital += c.val;
+  if (c.val < 0) window.communityPot += Math.abs(c.val);
+
+  window.openModal(
+    "COMMUNAUTÉ",
+    `<div style="font-size:2rem;font-weight:900;color:${c.val>0?'var(--vert)':'var(--rouge)'}">
+       ${c.m}
+     </div>
+     <div style="font-size:4rem;font-weight:900;">
+       ${c.val>0?'+':''}${c.val}€
+     </div>
+     <button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">OK</button>`
+  );
+
+} else if (data.type === 'ms') {
+  window.triggerMS(idx, data.val);
+
+} else if (data.type === 'chance') {
+  window.triggerChance(idx);
+
+} else if (!data.type) {
+  window.triggerInvest(idx, team.pos);
+
+} else {
+  window.nextTurn();
 }
+
 
       const cards = [{ m: "Aide de l'État", val: 200 }, { m: "Dividendes (15%)", val: 300 }, { m: "Amende URSSAF", val: -200 }, { m: "Taxes", val: -100 }];
       const c = cards[Math.floor(Math.random() * cards.length)];
