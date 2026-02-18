@@ -1205,12 +1205,21 @@ window.negoStep3 = (att, def, pos) => {
     clearInterval(window.questionTimer);
   };
 
-  window.nextTurn = () => {
+ window.nextTurn = () => {
   window.currentTurn = (window.currentTurn + 1) % 4;
   window.updateUI();
   window.closeModal();
+
+  // 🔥 Vérification faillite BLOQUANTE
+  if (isBankrupt(window.currentTurn)) {
+    startBankruptcyTurn(window.currentTurn);
+    return;
+  }
+
+  // 💰 liquidation optionnelle (<=500€)
   checkOptionalLiquidationAtTurnStart();
 };
+
 
 
  window.showRecap = (i) => {
