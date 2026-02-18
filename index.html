@@ -780,18 +780,20 @@ window.finishGame = () => {
     p.style.left = `${rect.left + rect.width/2 - 17 + (idx*4)}px`;
     p.style.top  = `${rect.top  + rect.height/2 - 17 + (idx*4)}px`;
   };
-
-  window.rollDice = async (idx) => {
-    if (idx !== window.currentTurn || window.isMoving) return;
-    if (window.liquidationMode) return;
-      // Bloque le dé si l'équipe est en faillite ou en liquidation
+window.rollDice = async (idx) => {
+  if (idx !== window.currentTurn || window.isMoving) return;
+  if (window.liquidationMode) return;
   if (window.liquidationMode && idx === window.liquidationTeamIdx) return;
   if (window.teams[idx].capital <= 0) return;
-};
 
-    if (!window.gameStarted) { window.gameStarted = true; window.startGlobalTimer(); }
+  if (!window.gameStarted) {
+    window.gameStarted = true;
+    window.startGlobalTimer();
+  }
 
-    const team = window.teams[idx];
+  const team = window.teams[idx];
+ 
+
     if (team.prison > 0) {
       team.prison--;
       window.openModal("👮 PRISON", `<p style="font-size:1.5rem">Encore ${team.prison} tour(s).</p><button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">PASSER</button>`);
