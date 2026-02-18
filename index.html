@@ -787,7 +787,7 @@ window.finishGame = () => {
       // Bloque le dé si l'équipe est en faillite ou en liquidation
   if (window.liquidationMode && idx === window.liquidationTeamIdx) return;
   if (window.teams[idx].capital <= 0) return;
-
+};
 
     if (!window.gameStarted) { window.gameStarted = true; window.startGlobalTimer(); }
 
