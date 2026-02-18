@@ -366,17 +366,69 @@
     }, 1000);
   };
 
-  window.finishGame = () => {
-    clearInterval(window.gameInterval);
-    let finalScores = [0, 0, 0, 0];
-    window.corporateShares.forEach(shares => { if(shares.length === 3 && shares[0] === shares[1] && shares[1] === shares[2]) finalScores[shares[0]]++; });
-    let maxScore = Math.max(...finalScores);
-    let winners = window.teams.filter((t, i) => finalScores[i] === maxScore);
-    let html = `<div style="background:#f1c40f;color:#1e293b;padding:25px;font-size:2.5rem;font-weight:900;border-radius:15px;margin-bottom:30px;text-transform:uppercase;">${winners.length > 1 ? "ÉGALITÉ !" : `VICTOIRE : ${winners[0].name.toUpperCase()} !`}</div>`;
-    window.teams.forEach((t, i) => { html += `<div style="display:flex;justify-content:space-between;padding:15px;border-bottom:2px solid #eee;font-size:1.4rem;color:${t.color}"><span>Équipe ${t.name}</span><b>${finalScores[i]} Ent. Complètes</b></div>`; });
-    html += `<button onclick="window.location.reload()" style="background:#22c55e;color:white;padding:15px 40px;font-size:1.5rem;font-weight:900;border-radius:50px;cursor:pointer;margin-top:20px;border:none;">NOUVELLE PARTIE</button>`;
-    window.openModal("🏁 FIN DE PARTIE", html);
-  };
+window.finishGame = () => {
+  clearInterval(window.gameInterval);
+
+  // 1) Score principal : entreprises complètes (3 parts identiques)
+  let completeScores = [0, 0, 0, 0];
+  window.corporateShares.forEach(shares => {
+    if (shares.length === 3 && shares[0] === shares[1] && shares[1] === shares[2]) {
+      completeScores[shares[0]]++;
+    }
+  });
+
+  const maxComplete = Math.max(...completeScores);
+
+  // 2) Fallback : si aucune entreprise complète, on compte le total de parts
+  let mode = "complete";
+  let finalScores = completeScores;
+
+  if (maxComplete === 0) {
+    mode = "shares";
+    let shareScores = [0, 0, 0, 0];
+    window.corporateShares.forEach(shares => {
+      shares.forEach(teamIdx => {
+        if (teamIdx !== undefined && teamIdx !== null) shareScores[teamIdx]++;
+      });
+    });
+    finalScores = shareScores;
+  }
+
+  const maxScore = Math.max(...finalScores);
+  const winners = window.teams.filter((t, i) => finalScores[i] === maxScore);
+
+  // UI message selon la règle utilisée
+  const subtitle =
+    mode === "complete"
+      ? "Victoire au nombre d'entreprises complètes"
+      : "Aucune entreprise complète : victoire au nombre total de parts";
+
+  let html = `
+    <div style="background:#f1c40f;color:#1e293b;padding:25px;font-size:2.5rem;font-weight:900;border-radius:15px;margin-bottom:15px;text-transform:uppercase;">
+      ${winners.length > 1 ? "ÉGALITÉ !" : `VICTOIRE : ${winners[0].name.toUpperCase()} !`}
+    </div>
+    <div style="color:#475569;font-weight:900;margin-bottom:25px;">${subtitle}</div>
+  `;
+
+  // Affichage des scores
+  window.teams.forEach((t, i) => {
+    const label = mode === "complete" ? "Ent. complètes" : "Parts totales";
+    html += `
+      <div style="display:flex;justify-content:space-between;padding:15px;border-bottom:2px solid #eee;font-size:1.4rem;color:${t.color}">
+        <span>Équipe ${t.name}</span>
+        <b>${finalScores[i]} ${label}</b>
+      </div>`;
+  });
+
+  html += `
+    <button onclick="window.location.reload()" style="background:#22c55e;color:white;padding:15px 40px;font-size:1.5rem;font-weight:900;border-radius:50px;cursor:pointer;margin-top:20px;border:none;">
+      NOUVELLE PARTIE
+    </button>
+  `;
+
+  window.openModal("🏁 FIN DE PARTIE", html);
+};
+
 
   window.startQTimer = (seconds, callback) => {
     if(window.questionTimer) clearInterval(window.questionTimer);
