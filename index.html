@@ -519,40 +519,71 @@
     } else alert("Fonds insuffisants");
   };
 
-  window.negoStep1 = (att, pos) => {
-    const student = getRandomStudent(att);
-    window.openModal("⚠️ OPA", `<p style="font-size:1.8rem">L'offre sera faite par :</p><div class="student-badge">👉 ${student}</div><button class="btn-action" style="background:var(--vert)" onclick="window.launchNego1(${att}, ${pos})">PRÊT ➤</button>`);
-  };
+  window.negoStep1 = (att, pos, def) => {
+  const student = getRandomStudent(att);
 
-  window.launchNego1 = (att, pos) => {
-    const q = ensureQuestionOrPrompt();
-    if (!q) return;
+  window.openModal(
+    "⚠️ OPA",
+    `<p style="font-size:1.8rem">L'offre sera faite par :</p>
+     <div class="student-badge">👉 ${student}</div>
+     <button class="btn-action" style="background:var(--vert)" onclick="window.launchNego1(${att}, ${def}, ${pos})">PRÊT ➤</button>`
+  );
+};
 
-    window.openModal("NÉGO ATTAQUE",
-      `<div id="timer-val" class="timer-box">30s</div>
-       <div class="quiz-box">${q}</div>
-       <button class="btn-action" style="background:var(--vert)" onclick="window.negoMakeOffer(${att}, ${pos})">JUSTE</button>
-       <button class="btn-action" style="background:var(--rouge)" onclick="window.negoFailed()">FAUX</button>`
-    );
-    window.startQTimer(30, () => window.negoFailed());
-  };
+window.launchNego1 = (att, def, pos) => {
+  const q = ensureQuestionOrPrompt();
+  if (!q) return;
 
-  window.negoFailed = () => {
-    clearInterval(window.questionTimer);
-    window.openModal("ÉCHEC ❌", `<p style="font-size:2rem;color:red;font-weight:900;">Tour terminé.</p><button class="btn-action" onclick="window.nextTurn()">OK</button>`);
-  };
+  window.openModal(
+    "NÉGO ATTAQUE",
+    `<div id="timer-val" class="timer-box">30s</div>
+     <div class="quiz-box">${q}</div>
+     <button class="btn-action" style="background:var(--vert)" onclick="window.negoMakeOffer(${att}, ${def}, ${pos})">JUSTE</button>
+     <button class="btn-action" style="background:var(--rouge)" onclick="window.negoFailed()">FAUX</button>`
+  );
 
-  window.negoMakeOffer = (att, pos) => {
-    clearInterval(window.questionTimer);
-    window.openModal("OFFRE", `<p style="font-size:1.8rem">Montant du rachat ?</p><input type="number" id="offer-val" style="width:100%;padding:15px;font-size:1.8rem;"><button class="btn-action" style="background:#f59e0b" onclick="window.negoStep3(${att}, ${pos})">Valider</button>`);
-  };
+  window.startQTimer(30, () => window.negoFailed());
+};
 
-  window.negoStep3 = (att, pos) => {
-    const amt = parseInt(document.getElementById('offer-val').value);
-    const def = parseInt(document.getElementById('nego-target').value);
-    const student = getRandomStudent(def);
-    window.openModal("⚠️ DÉFENSE", `<p style="font-size:1.8rem">La défense pour l'équipe ${window.teams[def].name} :</p><div class="student-badge">👉 ${student}</div><button class="btn-action" style="background:var(--vert)" onclick="window.launchNego3(${att}, ${def}, ${pos}, ${amt})">PRÊT ➤</button>`);
-  };
+window.negoFailed = () => {
+  clearInterval(window.questionTimer);
+  window.openModal(
+    "ÉCHEC ❌",
+    `<p style="font-size:2rem;color:red;font-weight:900;">Tour terminé.</p>
+     <button class="btn-action" onclick="window.nextTurn()">OK</button>`
+  );
+};
+
+window.negoMakeOffer = (att, def, pos) => {
+  clearInterval(window.questionTimer);
+
+  window.openModal(
+    "OFFRE",
+    `<p style="font-size:1.8rem">Montant du rachat ?</p>
+     <input type="number" id="offer-val" style="width:100%;padding:15px;font-size:1.8rem;" min="0" step="1">
+     <button class="btn-action" style="background:#f59e0b" onclick="window.negoStep3(${att}, ${def}, ${pos})">Valider</button>`
+  );
+};
+
+window.negoStep3 = (att, def, pos) => {
+  const raw = document.getElementById('offer-val')?.value ?? "";
+  const amt = parseInt(raw, 10);
+
+  if (!Number.isFinite(amt) || amt <= 0) {
+    alert("⚠️ Entrez un montant valide.");
+    return;
+  }
+
+  const student = getRandomStudent(def);
+
+  window.openModal(
+    "⚠️ DÉFENSE",
+    `<p style="font-size:1.8rem">La défense pour l'équipe ${window.teams[def].name} :</p>
+     <div class="student-badge">👉 ${student}</div>
+     <button class="btn-action" style="background:var(--vert)" onclick="window.launchNego3(${att}, ${def}, ${pos}, ${amt})">PRÊT ➤</button>`
+  );
+};
+
 
   window.launchNego3 = (att, def, pos, amt) => {
     const q = ensureQuestionOrPrompt();
