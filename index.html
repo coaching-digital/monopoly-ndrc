@@ -753,7 +753,8 @@ window.finishGame = () => {
   window.triggerInvest = (idx, pos, justBought=false) => {
     const data = boardData[pos]; const shares = window.corporateShares[pos];
     let h = `<p style="font-size:1.5rem">Parts vendues : ${shares.length}/3</p>`;
-    if (shares.length < 3 && !justBought) h += `<button class="btn-action" style="background:var(--vert)" onclick="window.buyShare(${idx}, ${pos})">Acheter 1 part (${data.price}€)</button>`;
+if (shares.length < 3 && !justBought)
+ h += `<button class="btn-action" style="background:var(--vert)" onclick="window.buyShareQuiz(${idx}, ${pos})">Acheter 1 part (${data.price}€)</button>`;
     if (shares.filter(t => t === idx).length >= 1 && shares.filter(t => t !== idx).length >= 1)
       h += `<div style="border-top:2px dashed #cbd5e1;margin-top:20px;padding-top:10px;"><p style="color:#0ea5e9;font-weight:900;font-size:1.8rem">🤝 NÉGOCIATION</p><select id="nego-target" style="width:100%;padding:15px;font-size:1.3rem;margin-bottom:15px;">${[...new Set(shares)].filter(t=>t!==idx).map(t => `<option value="${t}">Équipe ${window.teams[t].name}</option>`).join('')}</select><button class="btn-action" style="background:#f59e0b" onclick="window.negoStep1(${idx}, ${pos}, parseInt(document.getElementById('nego-target').value))">Lancer OPA</button>
 </div>`;
@@ -767,7 +768,87 @@ window.finishGame = () => {
       window.corporateShares[pos].push(idx);
       window.triggerInvest(idx, pos, true);
     } else alert("Fonds insuffisants");
-  };
+    // ============================================================
+// ACHAT CLASSIQUE : question obligatoire avant achat
+// ============================================================
+
+window.buyShareQuiz = (idx, pos) => {
+  // Vérif fonds AVANT de poser la question (sinon ça frustre)
+  const price = boardData[pos].price;
+  if (window.teams[idx].capital < price) {
+    alert("Fonds insuffisants");
+    window.nextTurn();
+    return;
+  }
+
+  const student = getRandomStudent(idx);
+
+  window.openModal(
+    "🧠 QUESTION AVANT ACHAT",
+    `<p style="font-size:1.5rem">La question est pour :</p>
+     <div class="student-badge">👉 ${student}</div>
+     <p style="font-size:1.2rem;color:#64748b;margin-top:10px;">
+       Si c'est juste → vous pourrez acheter 1 part. Sinon → fin du tour.
+     </p>
+     <button class="btn-action" style="background:var(--vert)" onclick="window.launchBuyShareQuiz(${idx}, ${pos})">JE SUIS PRÊT(E) ➤</button>`
+  );
+};
+
+window.launchBuyShareQuiz = (idx, pos) => {
+  const q = ensureQuestionOrPrompt();
+  if (!q) return;
+
+  window.openModal(
+    "🧠 ACHAT CLASSIQUE",
+    `<div id="timer-val" class="timer-box">30s</div>
+     <div class="quiz-box">${q}</div>
+     <button class="btn-action" style="background:var(--vert)" onclick="window.resolveBuyShareQuiz(${idx}, ${pos}, true)">JUSTE ✅</button>
+     <button class="btn-action" style="background:var(--rouge)" onclick="window.resolveBuyShareQuiz(${idx}, ${pos}, false)">FAUX ❌</button>`
+  );
+
+  window.startQTimer(30, () => window.resolveBuyShareQuiz(idx, pos, false));
+};
+
+window.resolveBuyShareQuiz = (idx, pos, success) => {
+  clearInterval(window.questionTimer);
+
+  if (!success) {
+    window.openModal(
+      "❌ MAUVAISE RÉPONSE",
+      `<p style="font-size:1.8rem;font-weight:900;color:var(--rouge)">Fin du tour.</p>
+       <button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">OK</button>`
+    );
+    return;
+  }
+
+  // Succès -> on propose l'achat (on re-vérifie au cas où)
+  const price = boardData[pos].price;
+  if (window.teams[idx].capital < price) {
+    window.openModal(
+      "⚠️ ACHAT IMPOSSIBLE",
+      `<p style="font-size:1.5rem">Vous n'avez plus assez de capital pour acheter.</p>
+       <button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">OK</button>`
+    );
+    return;
+  }
+
+  window.openModal(
+    "✅ RÉPONSE JUSTE",
+    `<p style="font-size:1.6rem">Vous pouvez acheter <b>1 part</b> de <b>${boardData[pos].name}</b> pour <b>${price}€</b>.</p>
+     <button class="btn-action" style="background:var(--vert)" onclick="window.buyShareAfterQuiz(${idx}, ${pos})">ACHETER LA PART</button>
+     <button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">Ne pas acheter (fin du tour)</button>`
+  );
+};
+
+window.buyShareAfterQuiz = (idx, pos) => {
+  // Achat réel
+  window.buyShare(idx, pos);
+  // À toi de choisir la règle :
+  // - si tu veux que l'achat termine le tour :
+  window.nextTurn();
+  // - sinon, commente la ligne au-dessus.
+};
+
 
   window.negoStep1 = (att, pos, def) => {
   const student = getRandomStudent(att);
