@@ -1037,13 +1037,9 @@ window.resolveBuyShareQuiz = (idx, pos, success) => {
 };
 
 window.buyShareAfterQuiz = (idx, pos) => {
-  // Achat réel
   window.buyShare(idx, pos);
-  // À toi de choisir la règle :
-  // - si tu veux que l'achat termine le tour :
-  window.nextTurn();
-  // - sinon, commente la ligne au-dessus.
 };
+
 
 
   window.negoStep1 = (att, pos, def) => {
