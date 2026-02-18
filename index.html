@@ -342,6 +342,143 @@
     }
     return res;
   }
+// ============================================================
+// FAILLITE / LIQUIDATION BLOQUANTE
+// ============================================================
+window.liquidationMode = false;          // true = on est en phase vente
+window.liquidationTeamIdx = null;        // équipe concernée
+window.liquidationAwaitPick = false;     // true = l'équipe doit cliquer une case
+window._turnPromptShownFor = null;       // évite de ré-afficher la popup 50 fois
+
+function isBankrupt(idx) {
+  return window.teams[idx].capital <= 0;
+}
+
+function startBankruptcyTurn(teamIdx) {
+  window.liquidationMode = true;
+  window.liquidationTeamIdx = teamIdx;
+  window.liquidationAwaitPick = false;
+
+  window.openModal("💥 FAILLITE", `
+    <p style="font-size:1.6rem;font-weight:900;color:#ef4444;margin-bottom:10px;">
+      Vous êtes en faillite.
+    </p>
+    <p style="font-size:1.2rem;color:#334155;margin-bottom:20px;">
+      Vendez des parts pour continuer à jouer.
+    </p>
+    <button class="btn-action" style="background:var(--vert)" onclick="window.beginLiquidationPick()">
+      ✅ VENDRE DES PARTS
+    </button>
+    <p style="color:#64748b;margin-top:10px;font-size:1rem;">
+      (Vous devrez cliquer une entreprise où vous possédez des parts.)
+    </p>
+  `);
+}
+
+window.beginLiquidationPick = () => {
+  window.liquidationAwaitPick = true;
+  window.closeModal(); // important : on ferme la modale pour pouvoir cliquer sur le plateau
+};
+
+// appelé quand on clique une case pendant la liquidation
+window.handleLiquidationCaseClick = (pos) => {
+  const teamIdx = window.liquidationTeamIdx;
+
+  // sécurité
+  if (!window.liquidationMode || teamIdx === null) return;
+  if (!window.liquidationAwaitPick) return;
+
+  // il faut une entreprise (pas spécial, pas chance, etc.)
+  if (boardData[pos].type) {
+    window.openModal("⛔ CASE INVALIDE", `
+      <p style="font-size:1.4rem;">Choisis une <b>entreprise</b> (une case achetable).</p>
+      <button class="btn-action" style="background:#64748b" onclick="window.beginLiquidationPick()">OK</button>
+    `);
+    return;
+  }
+
+  // il faut posséder au moins 1 part sur cette entreprise
+  const shares = window.corporateShares[pos];
+  const ownedCount = shares.filter(x => x === teamIdx).length;
+  if (ownedCount <= 0) {
+    window.openModal("⛔ PAS DE PART", `
+      <p style="font-size:1.4rem;">Vous ne possédez aucune part sur <b>${boardData[pos].name}</b>.</p>
+      <button class="btn-action" style="background:#64748b" onclick="window.beginLiquidationPick()">OK</button>
+    `);
+    return;
+  }
+
+  // OK -> question
+  window.liquidationAwaitPick = false;
+
+  const q = ensureQuestionOrPrompt();
+  if (!q) { 
+    // si pas de questions, on remet le mode sélection
+    window.liquidationAwaitPick = true;
+    return; 
+  }
+
+  window.openModal("💸 LIQUIDATION - QUESTION", `
+    <div id="timer-val" class="timer-box">30s</div>
+    <p style="font-size:1.2rem;color:#334155;">
+      Vente d’1 part de <b>${boardData[pos].name}</b><br>
+      Valeur rachat : <b>${Math.floor(boardData[pos].price * 0.5)}€</b> (50%)
+    </p>
+    <div class="quiz-box">${q}</div>
+    <button class="btn-action" style="background:var(--vert)" onclick="window.resolveLiquidation(${teamIdx}, ${pos}, true)">JUSTE ✅</button>
+    <button class="btn-action" style="background:var(--rouge)" onclick="window.resolveLiquidation(${teamIdx}, ${pos}, false)">FAUX ❌</button>
+  `);
+
+  window.startQTimer(30, () => window.resolveLiquidation(teamIdx, pos, false));
+};
+
+window.resolveLiquidation = (teamIdx, pos, success) => {
+  clearInterval(window.questionTimer);
+
+  if (!success) {
+    // faux -> fin du tour, on sort du mode liquidation
+    window.liquidationMode = false;
+    window.liquidationTeamIdx = null;
+    window.liquidationAwaitPick = false;
+
+    window.openModal("❌ LIQUIDATION ÉCHOUÉE", `
+      <p style="font-size:1.5rem;color:#ef4444;font-weight:900;">Mauvaise réponse : fin du tour.</p>
+      <button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">OK</button>
+    `);
+    return;
+  }
+
+  // juste -> on vend 1 part à 50%
+  const arr = window.corporateShares[pos];
+  const idxInArr = arr.indexOf(teamIdx);
+  if (idxInArr !== -1) arr.splice(idxInArr, 1);
+
+  const gain = Math.floor(boardData[pos].price * 0.5);
+  window.teams[teamIdx].capital += gain;
+
+  window.updateUI();
+
+  // encore en faillite ? -> recommencer
+  if (isBankrupt(teamIdx)) {
+    window.openModal("✅ PART VENDUE", `
+      <p style="font-size:1.4rem;">+${gain}€</p>
+      <p style="color:#ef4444;font-weight:900;">Toujours en faillite : vendez encore.</p>
+      <button class="btn-action" style="background:var(--vert)" onclick="window.beginLiquidationPick()">VENDRE UNE AUTRE PART</button>
+    `);
+    return;
+  }
+
+  // plus en faillite -> on quitte liquidation, l'équipe peut jouer son tour
+  window.liquidationMode = false;
+  window.liquidationTeamIdx = null;
+  window.liquidationAwaitPick = false;
+
+  window.openModal("✅ LIQUIDATION RÉUSSIE", `
+    <p style="font-size:1.4rem;">+${gain}€</p>
+    <p style="color:#16a34a;font-weight:900;">Vous pouvez continuer votre tour et lancer le dé.</p>
+    <button class="btn-action" style="background:var(--vert)" onclick="window.closeModal()">OK</button>
+  `);
+};
 
   function setCasePickVisual(pos, picked) {
     const el = document.getElementById(`case-${pos}`);
@@ -647,6 +784,10 @@ window.finishGame = () => {
   window.rollDice = async (idx) => {
     if (idx !== window.currentTurn || window.isMoving) return;
     if (window.liquidationMode) return;
+      // Bloque le dé si l'équipe est en faillite ou en liquidation
+  if (window.liquidationMode && idx === window.liquidationTeamIdx) return;
+  if (window.teams[idx].capital <= 0) return;
+
 
     if (!window.gameStarted) { window.gameStarted = true; window.startGlobalTimer(); }
 
@@ -1017,12 +1158,21 @@ window.negoStep3 = (att, def, pos) => {
 };
 
 
-  window.showRecap = (i) => {
-    const s = window.corporateShares[i]; let t = s.length ? "" : "Libre";
-    window.teams.forEach((tm, idx) => {
-      const c = s.filter(x => x === idx).length;
-      if(c>0) t+=`<p style="font-size:1.3rem">${tm.name}: <b>${c}</b> part(s)</p>`;
-    });
-    window.openModal(boardData[i].name, t);
+ window.showRecap = (i) => {
+  // Si liquidation active : clic sur une entreprise = tentative de vente
+  if (window.liquidationMode && window.currentTurn === window.liquidationTeamIdx) {
+    return window.handleLiquidationCaseClick(i);
+  }
+
+  // comportement normal : recap
+  const s = window.corporateShares[i]; 
+  let t = s.length ? "" : "Libre";
+  window.teams.forEach((tm, idx) => {
+    const c = s.filter(x => x === idx).length;
+    if(c>0) t+=`<p style="font-size:1.3rem">${tm.name}: <b>${c}</b> part(s)</p>`;
+  });
+  window.openModal(boardData[i].name, t);
+};
+
   };
 </script>
