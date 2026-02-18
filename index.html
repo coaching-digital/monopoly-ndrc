@@ -885,7 +885,7 @@ window.rollDice = async (idx) => {
 } else {
   window.nextTurn();
 }
-
+};
   window.triggerChance = (idx) => {
     const student = getRandomStudent(idx);
     window.openModal("⚠️ QUESTION CHANCE", `<p style="font-size:1.5rem">La question est pour :</p><div class="student-badge">👉 ${student}</div><p>Tenez-vous prêt(e)...</p><button class="btn-action" style="background:var(--vert)" onclick="window.launchChance(${idx})">JE SUIS PRÊT(E) ➤</button>`);
