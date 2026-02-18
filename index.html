@@ -298,21 +298,23 @@
   }
 
   function ensureQuestionOrPrompt() {
-    const q = getUniqueQuestion();
-    if (q) return q;
+  const q = getUniqueQuestion();
+  if (q) return q;
 
-    const extra = !QUESTIONS_CSV_URL
-      ? `<p style="color:#64748b;margin-top:10px;">Choisis d'abord un <b>thème</b>.</p>
-         <button class="btn-action" style="background:#0f172a;color:white" onclick="document.getElementById('theme-overlay').classList.remove('hidden')">🎯 CHOISIR UN THÈME</button>`
-      : `<p style="color:#64748b;margin-top:10px;">CSV vide / non chargé pour <b>${currentThemeName}</b>.</p>
+  const extra = !QUESTIONS_CSV_URL
+    ? `<p style="color:#64748b;margin-top:10px;">Choisis d'abord un <b>thème</b>.</p>
+       <button class="btn-action" style="background:#0f172a;color:white" onclick="document.getElementById('theme-overlay').classList.remove('hidden')">🎯 CHOISIR UN THÈME</button>`
+    : `<p style="color:#64748b;margin-top:10px;">CSV vide / non chargé pour <b>${currentThemeName}</b>.</p>
+       <button class="btn-action" style="background:#0f172a;color:white" onclick="window.location.reload()">🔄 RECHARGER</button>`;
 
-    window.openModal("📥 QUESTIONS INDISPONIBLES", `
-      <p style="font-size:1.5rem">Impossible d'afficher une question.</p>
-      ${extra}
-      <button class="btn-action" style="background:#64748b" onclick="window.closeModal()">OK</button>
-    `);
-    return null;
-  }
+  window.openModal("📥 QUESTIONS INDISPONIBLES", `
+    <p style="font-size:1.5rem">Impossible d'afficher une question.</p>
+    ${extra}
+    <button class="btn-action" style="background:#64748b" onclick="window.closeModal()">OK</button>
+  `);
+  return null;
+}
+
 
   // ============================================================
 
