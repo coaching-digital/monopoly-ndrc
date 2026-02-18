@@ -820,6 +820,23 @@ window.finishGame = () => {
       team.pos = 10; team.prison = 1; window.updatePawnVisual(idx, 10);
       window.openModal("👮 POLICE", `<p style="font-size:1.5rem;color:red;font-weight:900">FRAUDE ! Direction prison.</p><button class="btn-action" style="background:var(--rouge)" onclick="window.nextTurn()">OK</button>`);
     } else if (data.type === 'commu') {
+      else if (data.name === "PARC") {
+  const gain = window.communityPot;
+  window.communityPot = 0;
+  window.teams[idx].capital += gain;
+
+  window.openModal(
+    "🌳 PARC",
+    `<div style="font-size:2.2rem;font-weight:900;color:#22c55e">
+       VOUS RÉCUPÉREZ LA CAGNOTTE !
+     </div>
+     <div style="font-size:4rem;font-weight:900;margin:20px 0;">
+       +${gain}€
+     </div>
+     <button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">OK</button>`
+  );
+}
+
       const cards = [{ m: "Aide de l'État", val: 200 }, { m: "Dividendes (15%)", val: 300 }, { m: "Amende URSSAF", val: -200 }, { m: "Taxes", val: -100 }];
       const c = cards[Math.floor(Math.random() * cards.length)];
       team.capital += c.val; if(c.val < 0) window.communityPot += Math.abs(c.val);
