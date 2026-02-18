@@ -150,7 +150,6 @@
 <div id="theme-overlay" class="hidden">
   <div class="setup-container">
     <h1 style="color:#38bdf8; margin-top:0; font-size:2.2rem;">Choisir le thème de la partie</h1>
-    <p style="margin-bottom:20px; color:#cbd5e1;">Le jeu chargera uniquement les questions du CSV associé.</p>
 
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
       <button class="btn-action" style="background:#3b82f6" onclick="window.selectTheme('communication.csv','Communication digitale')">Communication digitale</button>
@@ -276,8 +275,8 @@
       rebuildBag();
       questionsReady = true;
 
-      if (showAlert) alert(`✅ Questions chargées (${currentThemeName}) : ${questionBank.length}`);
-      console.log("Questions chargées :", currentThemeName, questionBank.length);
+     // (popup supprimé)
+
     } catch (e) {
       questionsReady = false;
       console.warn("Impossible de charger le CSV de questions", e);
