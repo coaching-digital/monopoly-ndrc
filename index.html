@@ -616,13 +616,26 @@ window.negoFailed = () => {
 window.negoMakeOffer = (att, def, pos) => {
   clearInterval(window.questionTimer);
 
+  const prixPart = boardData[pos].price;
+  const minimum = Math.ceil(prixPart * 0.30);
+
   window.openModal(
     "OFFRE",
     `<p style="font-size:1.8rem">Montant du rachat ?</p>
-     <input type="number" id="offer-val" style="width:100%;padding:15px;font-size:1.8rem;" min="0" step="1">
-     <button class="btn-action" style="background:#f59e0b" onclick="window.negoStep3(${att}, ${def}, ${pos})">Valider</button>`
+     <input 
+       type="number"
+       id="offer-val"
+       placeholder="Montant min. ${minimum}€"
+       style="width:100%;padding:15px;font-size:1.8rem;color:#111;"
+       min="${minimum}"
+       step="1"
+     >
+     <button class="btn-action" style="background:#f59e0b" onclick="window.negoStep3(${att}, ${def}, ${pos})">
+       Valider
+     </button>`
   );
 };
+
 
 window.negoStep3 = (att, def, pos) => {
   const raw = document.getElementById('offer-val')?.value ?? "";
