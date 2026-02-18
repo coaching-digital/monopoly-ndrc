@@ -135,6 +135,11 @@
 
   /* NOUVEL OVERLAY THEME */
   #theme-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; }
+  /* LIQUIDATION : cases sélectionnées */
+  .case.liquidation-pick {
+    outline: 4px solid #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245,158,11,0.25);
+  }
 
 </style>
 
@@ -320,6 +325,190 @@
   `);
   return null;
 }
+  // ============================================================
+  // LIQUIDATION OPTIONNELLE (seuil 500€) - VENTE DES PARTS À 50%
+  // ============================================================
+
+  window.liquidationMode = false;
+  window.liquidationTeamIdx = null;
+  window.liquidationSelected = new Set(); // positions sélectionnées
+
+  function teamOwnedPositions(teamIdx) {
+    const res = [];
+    for (let pos = 0; pos < window.corporateShares.length; pos++) {
+      const shares = window.corporateShares[pos];
+      const count = shares.filter(x => x === teamIdx).length;
+      if (count > 0) res.push({ pos, count });
+    }
+    return res;
+  }
+
+  function setCasePickVisual(pos, picked) {
+    const el = document.getElementById(`case-${pos}`);
+    if (!el) return;
+    if (picked) el.classList.add("liquidation-pick");
+    else el.classList.remove("liquidation-pick");
+  }
+
+  function clearAllPickVisual() {
+    for (let i = 0; i < 40; i++) setCasePickVisual(i, false);
+  }
+
+  function renderLiquidationModal() {
+    const t = window.teams[window.liquidationTeamIdx];
+    const owned = teamOwnedPositions(window.liquidationTeamIdx);
+
+    if (!owned.length) {
+      window.openModal("💸 LIQUIDATION", `
+        <p style="font-size:1.5rem">Vous ne possédez aucune part à vendre.</p>
+        <button class="btn-action" style="background:#64748b" onclick="window.exitLiquidation()">OK</button>
+      `);
+      return;
+    }
+
+    let listHtml = owned.map(({pos, count}) => {
+      const price = boardData[pos].price || 0;
+      const refundEach = Math.floor(price * 0.5);
+      const picked = window.liquidationSelected.has(pos);
+      return `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid #e2e8f0;">
+          <div style="text-align:left;">
+            <b>${boardData[pos].name}</b><br>
+            <span style="color:#64748b">Parts: ${count} • Rachat: ${refundEach}€ / part</span>
+          </div>
+          <button class="btn-action" style="width:auto;padding:10px 14px;font-size:1rem;background:${picked ? '#f59e0b' : '#334155'}"
+            onclick="window.toggleLiquidationPick(${pos})">
+            ${picked ? 'SÉLECTIONNÉ' : 'CHOISIR'}
+          </button>
+        </div>
+      `;
+    }).join("");
+
+    window.openModal("💸 LIQUIDATION (vente à 50%)", `
+      <p style="font-size:1.4rem;margin-top:0">
+        Équipe <b style="color:${t.color}">${t.name}</b> — Capital actuel : <b>${t.capital}€</b><br>
+        Cliquez sur les entreprises ci-dessous (ou sur le plateau) pour sélectionner, puis vendez.
+      </p>
+
+      <div style="max-height:320px;overflow:auto;border:2px solid #e2e8f0;border-radius:12px;">
+        ${listHtml}
+      </div>
+
+      <button class="btn-action" style="background:#22c55e" onclick="window.sellSelectedShares()">
+        💰 VENDRE LES PARTS SÉLECTIONNÉES
+      </button>
+
+      <button class="btn-action" style="background:#64748b" onclick="window.exitLiquidation()">
+        ✅ TERMINER (continuer la partie)
+      </button>
+    `);
+  }
+
+  window.enterLiquidation = (teamIdx) => {
+    window.liquidationMode = true;
+    window.liquidationTeamIdx = teamIdx;
+    window.liquidationSelected = new Set();
+    clearAllPickVisual();
+    renderLiquidationModal();
+  };
+
+  window.exitLiquidation = () => {
+    clearAllPickVisual();
+    window.liquidationMode = false;
+    window.liquidationTeamIdx = null;
+    window.liquidationSelected = new Set();
+    window.closeModal();
+    window.updateUI();
+  };
+
+  window.toggleLiquidationPick = (pos) => {
+    if (!window.liquidationMode) return;
+
+    const teamIdx = window.liquidationTeamIdx;
+    const shares = window.corporateShares[pos];
+    const count = shares.filter(x => x === teamIdx).length;
+    if (count <= 0) return;
+
+    if (window.liquidationSelected.has(pos)) {
+      window.liquidationSelected.delete(pos);
+      setCasePickVisual(pos, false);
+    } else {
+      window.liquidationSelected.add(pos);
+      setCasePickVisual(pos, true);
+    }
+    renderLiquidationModal();
+  };
+
+  window.sellSelectedShares = () => {
+    const teamIdx = window.liquidationTeamIdx;
+    if (teamIdx === null) return;
+
+    const selected = Array.from(window.liquidationSelected);
+    if (!selected.length) {
+      alert("Sélectionnez au moins une entreprise à vendre.");
+      return;
+    }
+
+    let totalRefund = 0;
+
+    selected.forEach((pos) => {
+      const price = boardData[pos].price || 0;
+      const refundEach = Math.floor(price * 0.5);
+
+      const before = window.corporateShares[pos].length;
+      window.corporateShares[pos] = window.corporateShares[pos].filter(x => x !== teamIdx);
+      const after = window.corporateShares[pos].length;
+
+      const removed = before - after;
+      if (removed > 0) totalRefund += removed * refundEach;
+
+      setCasePickVisual(pos, false);
+    });
+
+    window.teams[teamIdx].capital += totalRefund;
+    window.liquidationSelected = new Set();
+    window.updateUI();
+
+    window.openModal("✅ VENTE EFFECTUÉE", `
+      <p style="font-size:1.8rem;font-weight:900;color:#22c55e">+${totalRefund}€</p>
+      <p style="font-size:1.4rem">Capital actuel : <b>${window.teams[teamIdx].capital}€</b></p>
+      <button class="btn-action" style="background:#64748b" onclick="renderLiquidationModal()">Continuer</button>
+    `);
+  };
+
+  // Gestion clic plateau : en liquidation => sélection / sinon => recap
+  window.handleBoardClick = (pos) => {
+    if (window.liquidationMode) {
+      window.toggleLiquidationPick(pos);
+    } else {
+      window.showRecap(pos);
+    }
+  };
+
+  // Popup automatique quand une équipe arrive à 500€ ou moins au début de son tour
+  function checkOptionalLiquidationAtTurnStart() {
+    const idx = window.currentTurn;
+    const team = window.teams[idx];
+
+    // si déjà en mode liquidation on ne relance pas une popup
+    if (window.liquidationMode) return;
+
+    // seuil : 500€ ou moins
+    if (team.capital > 500) return;
+
+    // s'il n'a rien à vendre, inutile
+    const owned = teamOwnedPositions(idx);
+    if (!owned.length) return;
+
+    window.openModal("⚠️ LIQUIDATION OPTIONNELLE", `
+      <p style="font-size:1.6rem">
+        Équipe <b style="color:${team.color}">${team.name}</b> : vous êtes à <b>${team.capital}€</b>.<br>
+        Souhaitez-vous vendre des parts (rachat à <b>50%</b>) ?
+      </p>
+      <button class="btn-action" style="background:#22c55e" onclick="window.enterLiquidation(${idx})">OUI, VENDRE DES PARTS</button>
+      <button class="btn-action" style="background:#64748b" onclick="window.closeModal()">NON</button>
+    `);
+  }
 
 
   // ============================================================
@@ -349,7 +538,7 @@
       div.id = `case-${i}`;
       div.innerHTML = `<span>${data.name}</span>${data.price ? `<br>${data.price}€` : ''}`;
       if (!data.type) div.innerHTML += `<div class="shares-container" id="shares-${i}"></div>`;
-      div.onclick = () => window.showRecap(i);
+div.onclick = () => window.handleBoardClick(i);
       board.appendChild(div);
     });
 
@@ -457,6 +646,8 @@ window.finishGame = () => {
 
   window.rollDice = async (idx) => {
     if (idx !== window.currentTurn || window.isMoving) return;
+    if (window.liquidationMode) return;
+
     if (!window.gameStarted) { window.gameStarted = true; window.startGlobalTimer(); }
 
     const team = window.teams[idx];
@@ -738,10 +929,12 @@ window.negoStep3 = (att, def, pos) => {
   };
 
   window.nextTurn = () => {
-    window.currentTurn = (window.currentTurn + 1) % 4;
-    window.updateUI();
-    window.closeModal();
-  };
+  window.currentTurn = (window.currentTurn + 1) % 4;
+  window.updateUI();
+  window.closeModal();
+  checkOptionalLiquidationAtTurnStart();
+};
+
 
   window.showRecap = (i) => {
     const s = window.corporateShares[i]; let t = s.length ? "" : "Libre";
