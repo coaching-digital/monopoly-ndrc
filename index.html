@@ -628,8 +628,16 @@ window.negoStep3 = (att, def, pos) => {
   const raw = document.getElementById('offer-val')?.value ?? "";
   const amt = parseInt(raw, 10);
 
+  const prixPart = boardData[pos].price;
+  const minimum = Math.ceil(prixPart * 0.30);
+
   if (!Number.isFinite(amt) || amt <= 0) {
     alert("⚠️ Entrez un montant valide.");
+    return;
+  }
+
+  if (amt < minimum) {
+    alert(`⚠️ Offre trop basse.\nMinimum requis : ${minimum}€ (30% du prix de la part).`);
     return;
   }
 
@@ -642,6 +650,7 @@ window.negoStep3 = (att, def, pos) => {
      <button class="btn-action" style="background:var(--vert)" onclick="window.launchNego3(${att}, ${def}, ${pos}, ${amt})">PRÊT ➤</button>`
   );
 };
+
 
 
   window.launchNego3 = (att, def, pos, amt) => {
