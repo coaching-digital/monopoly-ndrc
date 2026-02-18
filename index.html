@@ -305,7 +305,6 @@
       ? `<p style="color:#64748b;margin-top:10px;">Choisis d'abord un <b>thème</b>.</p>
          <button class="btn-action" style="background:#0f172a;color:white" onclick="document.getElementById('theme-overlay').classList.remove('hidden')">🎯 CHOISIR UN THÈME</button>`
       : `<p style="color:#64748b;margin-top:10px;">CSV vide / non chargé pour <b>${currentThemeName}</b>.</p>
-         <button class="btn-action" style="background:#0f172a;color:white" onclick="window.refreshQuestions()">📥 CHARGER QUESTIONS</button>`;
 
     window.openModal("📥 QUESTIONS INDISPONIBLES", `
       <p style="font-size:1.5rem">Impossible d'afficher une question.</p>
@@ -505,7 +504,7 @@
     let h = `<p style="font-size:1.5rem">Parts vendues : ${shares.length}/3</p>`;
     if (shares.length < 3 && !justBought) h += `<button class="btn-action" style="background:var(--vert)" onclick="window.buyShare(${idx}, ${pos})">Acheter 1 part (${data.price}€)</button>`;
     if (shares.filter(t => t === idx).length >= 1 && shares.filter(t => t !== idx).length >= 1)
-      h += `<div style="border-top:2px dashed #cbd5e1;margin-top:20px;padding-top:10px;"><p style="color:#0ea5e9;font-weight:900;font-size:1.8rem">🤝 NÉGOCIATION</p><select id="nego-target" style="width:100%;padding:15px;font-size:1.3rem;margin-bottom:15px;">${[...new Set(shares)].filter(t=>t!==idx).map(t => `<option value="${t}">Équipe ${window.teams[t].name}</option>`).join('')}</select><button class="btn-action" style="background:#f59e0b"onclick="window.negoStep1(${idx}, ${pos}, parseInt(document.getElementById('nego-target').value))">Lancer OPA</button>
+      h += `<div style="border-top:2px dashed #cbd5e1;margin-top:20px;padding-top:10px;"><p style="color:#0ea5e9;font-weight:900;font-size:1.8rem">🤝 NÉGOCIATION</p><select id="nego-target" style="width:100%;padding:15px;font-size:1.3rem;margin-bottom:15px;">${[...new Set(shares)].filter(t=>t!==idx).map(t => `<option value="${t}">Équipe ${window.teams[t].name}</option>`).join('')}</select><button class="btn-action" style="background:#f59e0b" onclick="window.negoStep1(${idx}, ${pos}, parseInt(document.getElementById('nego-target').value))">Lancer OPA</button>
 </div>`;
     h += `<button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">Fin du tour</button>`;
     window.openModal(data.name, h);
