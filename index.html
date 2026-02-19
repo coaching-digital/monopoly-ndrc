@@ -1272,13 +1272,38 @@ window.showRecap = (i) => {
     }
   }
 
-  // comportement normal : recap
-  const s = window.corporateShares[i]; 
-  let t = s.length ? "" : "Libre";
-  window.teams.forEach((tm, idx) => {
-    const c = s.filter(x => x === idx).length;
-    if(c>0) t+=`<p style="font-size:1.3rem">${tm.name}: <b>${c}</b> part(s)</p>`;
-  });
-  window.openModal(boardData[i].name, t);
+  const s = window.corporateShares[i];
+
+if (s.length === 0) {
+  window.openModal(boardData[i].name, "<p style='font-size:1.5rem'>Libre</p>");
+  return;
+}
+
+// Construction visuelle des 3 pastilles
+let dots = `<div style="display:flex;justify-content:center;gap:15px;margin-top:20px;">`;
+
+for (let k = 0; k < 3; k++) {
+  let color = "#cbd5e1"; // gris par défaut
+
+  if (s[k] !== undefined) {
+    color = window.teams[s[k]].color;
+  }
+
+  dots += `
+    <div style="
+      width:28px;
+      height:28px;
+      border-radius:50%;
+      background:${color};
+      border:3px solid white;
+      box-shadow:0 4px 8px rgba(0,0,0,0.3);
+    "></div>
+  `;
+}
+
+dots += `</div>`;
+
+window.openModal(boardData[i].name, dots);
+
 };
 </script>
