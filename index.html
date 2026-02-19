@@ -1260,7 +1260,15 @@ window.openModal = (t, b) => {
     "></div>
   `;
 
-  document.g
+  document.getElementById('modal-title').innerText = t;
+  document.getElementById('modal-body').innerHTML = b;
+
+  // On injecte la pastille en tête du contenu
+  document.getElementById('modal-body').insertAdjacentHTML('afterbegin', teamBadge);
+
+  document.getElementById('modal-overlay').classList.remove('hidden');
+};
+
 
 
   window.closeModal = () => {
