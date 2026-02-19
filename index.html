@@ -927,7 +927,39 @@ window.rollDice = async (idx) => {
   window.resolveChance = (idx, success) => {
     clearInterval(window.questionTimer);
     if (success) window.openModal("BRAVO ! 👏", `<div style="font-size:2.5rem;font-weight:900;color:var(--vert)">RÉPONSE JUSTE !</div><p>Relancez le dé immédiatement.</p><button class="btn-action" style="background:var(--vert)" onclick="window.closeModal()">RELANCER</button>`);
-    else { window.teams[idx].capital -= 150; window.communityPot += 150; window.openModal("DOMMAGE... ❌", `<div style="font-size:2rem;font-weight:900;color:var(--rouge)">MAUVAISE RÉPONSE</div><p>Amende de 150€ versée.</p><button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">OK</button>`); }
+else {
+
+  const malusCards = [
+    { m: "Amende URSSAF", val: -200 },
+    { m: "Taxes", val: -100 },
+    { m: "Pénalité contractuelle", val: -150 },
+    { m: "Retard fournisseur", val: -250 }
+  ];
+
+  const c = malusCards[Math.floor(Math.random() * malusCards.length)];
+
+  window.teams[idx].capital += c.val; // valeur négative
+  window.communityPot += Math.abs(c.val);
+
+  window.openModal(
+    "DOMMAGE... ❌",
+    `
+    <div style="font-size:2.2rem;font-weight:900;color:#1e293b;">
+      MAUVAISE RÉPONSE
+    </div>
+
+    <div style="font-size:3.5rem;font-weight:900;color:var(--rouge);margin:20px 0;">
+      ${c.val}€
+    </div>
+
+    <div style="font-size:1.4rem;color:#475569;">
+      ${c.m}
+    </div>
+
+    <button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">OK</button>
+    `
+  );
+}
   };
 
   window.triggerMS = (idx, p) => {
