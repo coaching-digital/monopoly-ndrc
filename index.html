@@ -208,10 +208,26 @@
 
 <script>
   window.teams = [
-    { name: "Rouge", color: "#ef4444", pos: 0, capital: 10000, prison: 0, players: [] },
-    { name: "Bleu", color: "#3b82f6", pos: 0, capital: 10000, prison: 0, players: [] },
-    { name: "Vert", color: "#22c55e", pos: 0, capital: 10000, prison: 0, players: [] },
-    { name: "Jaune", color: "#f1c40f", pos: 0, capital: 10000, prison: 0, players: [] }
+    { name: "Rouge", color: "#ef4444", pos: 0, capital: 10000, prison: 0, players: [], debt: 0,
+debtInstallment: 0,
+hasUsedCredit: false,
+eliminated: false,
+ },
+    { name: "Bleu", color: "#3b82f6", pos: 0, capital: 10000, prison: 0, players: [], debt: 0,
+debtInstallment: 0,
+hasUsedCredit: false,
+eliminated: false,
+},
+    { name: "Vert", color: "#22c55e", pos: 0, capital: 10000, prison: 0, players: [],  debt: 0,
+debtInstallment: 0,
+hasUsedCredit: false,
+eliminated: false,
+ },
+    { name: "Jaune", color: "#f1c40f", pos: 0, capital: 10000, prison: 0, players: [], debt: 0,
+debtInstallment: 0,
+hasUsedCredit: false,
+eliminated: false,
+}
   ];
 
   window.initGame = () => {
@@ -464,15 +480,26 @@ window.resolveLiquidation = (teamIdx, pos, success) => {
 
   window.updateUI();
 
-  // encore en faillite ? -> recommencer
-  if (isBankrupt(teamIdx)) {
-    window.openModal("✅ PART VENDUE", `
-      <p style="font-size:1.4rem;">+${gain}€</p>
-      <p style="color:#ef4444;font-weight:900;">Toujours en faillite : vendez encore.</p>
-      <button class="btn-action" style="background:var(--vert)" onclick="window.beginLiquidationPick()">VENDRE UNE AUTRE PART</button>
-    `);
+  // encore en faillite ?
+if (isBankrupt(teamIdx)) {
+
+  const owned = teamOwnedPositions(teamIdx);
+
+  // plus aucune part à vendre → crédit obligatoire
+  if (!owned.length) {
+    window.triggerForcedCredit(teamIdx);
     return;
   }
+
+  // sinon on continue liquidation normale
+  window.openModal("✅ PART VENDUE", `
+    <p style="font-size:1.4rem;">+${gain}€</p>
+    <p style="color:#ef4444;font-weight:900;">Toujours en faillite : vendez encore.</p>
+    <button class="btn-action" style="background:var(--vert)" onclick="window.beginLiquidationPick()">VENDRE UNE AUTRE PART</button>
+  `);
+  return;
+}
+
 
   // plus en faillite -> on quitte liquidation, l'équipe peut jouer son tour
   window.liquidationMode = false;
@@ -485,6 +512,70 @@ window.resolveLiquidation = (teamIdx, pos, success) => {
     <button class="btn-action" style="background:var(--vert)" onclick="window.closeModal()">OK</button>
   `);
 };
+  window.triggerForcedCredit = (teamIdx) => {
+
+  const team = window.teams[teamIdx];
+
+  // Si déjà utilisé un crédit → élimination directe
+  if (team.hasUsedCredit) {
+    window.eliminateTeam(teamIdx);
+    return;
+  }
+
+  window.openModal("🏦 CRÉDIT OBLIGATOIRE", `
+    <p style="font-size:1.5rem">
+      Vous êtes en cessation de paiement.<br>
+      Un crédit bancaire est obligatoire.
+    </p>
+
+    <p style="margin-top:20px;font-weight:900;">
+      Choisissez un montant :
+    </p>
+
+    <button class="btn-action" style="background:#22c55e"
+      onclick="window.takeCredit(${teamIdx}, 1000)">
+      1000€
+    </button>
+
+    <button class="btn-action" style="background:#f59e0b"
+      onclick="window.takeCredit(${teamIdx}, 1500)">
+      1500€
+    </button>
+
+    <button class="btn-action" style="background:#ef4444"
+      onclick="window.takeCredit(${teamIdx}, 2000)">
+      2000€
+    </button>
+  `);
+};
+window.takeCredit = (teamIdx, amount) => {
+
+  const team = window.teams[teamIdx];
+
+  team.capital += amount;
+
+  team.debt = Math.floor(amount * 1.05);
+  team.debtInstallment = Math.floor(amount * 0.05);
+  team.hasUsedCredit = true;
+
+  window.openModal("📄 CONTRAT BANCAIRE", `
+    <p style="font-size:1.5rem">
+      Montant emprunté : <b>${amount}€</b><br>
+      Intérêt : 5%<br>
+      Total à rembourser : <b>${team.debt}€</b><br>
+      Prélèvement automatique : <b>${team.debtInstallment}€</b> par tour
+    </p>
+
+    <button class="btn-action"
+      style="background:#64748b"
+      onclick="window.closeModal()">
+      Accepter et continuer
+    </button>
+  `);
+
+  window.updateUI();
+};
+
 
   function setCasePickVisual(pos, picked) {
     const el = document.getElementById(`case-${pos}`);
@@ -1274,10 +1365,44 @@ window.openModal = (t, b) => {
   window.closeModal = () => {
     document.getElementById('modal-overlay').classList.add('hidden');
     clearInterval(window.questionTimer);
+
   };
 
- window.nextTurn = () => {
+ window.currentTurn = (window.currentTurn + 1) % 4;
+
+// 🔥 SAUTER LES ÉQUIPES ÉLIMINÉES
+while (window.teams[window.currentTurn].eliminated) {
   window.currentTurn = (window.currentTurn + 1) % 4;
+}
+
+const team = window.teams[window.currentTurn];
+
+
+if (team.debt > 0) {
+
+  team.capital -= team.debtInstallment;
+  team.debt -= team.debtInstallment;
+
+  // crédit entièrement remboursé
+  if (team.debt <= 0) {
+    team.debt = 0;
+    team.debtInstallment = 0;
+
+    window.openModal("🏦 CRÉDIT REMBOURSÉ",
+      `<p style="font-size:1.5rem">
+        Votre crédit est entièrement remboursé.
+      </p>
+      <button class="btn-action" onclick="window.closeModal()">OK</button>`
+    );
+  }
+
+  // nouvelle faillite pendant remboursement → élimination
+  if (team.capital <= 0) {
+    window.eliminateTeam(window.currentTurn);
+    return;
+  }
+}
+
   window.updateUI();
   window.closeModal();
 
