@@ -1242,11 +1242,26 @@ window.negoStep3 = (att, def, pos) => {
     }
   };
 
-  window.openModal = (t, b) => {
-    document.getElementById('modal-title').innerText = t;
-    document.getElementById('modal-body').innerHTML = b;
-    document.getElementById('modal-overlay').classList.remove('hidden');
-  };
+window.openModal = (t, b) => {
+
+  const currentTeam = window.teams[window.currentTurn];
+
+  const teamBadge = `
+    <div style="
+      position:absolute;
+      top:20px;
+      left:20px;
+      width:22px;
+      height:22px;
+      border-radius:50%;
+      background:${currentTeam.color};
+      border:3px solid white;
+      box-shadow:0 2px 6px rgba(0,0,0,0.3);
+    "></div>
+  `;
+
+  document.g
+
 
   window.closeModal = () => {
     document.getElementById('modal-overlay').classList.add('hidden');
