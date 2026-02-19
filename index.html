@@ -1229,6 +1229,48 @@ window.showRecap = (i) => {
   if (window.liquidationMode && window.currentTurn === window.liquidationTeamIdx) {
     return window.handleLiquidationCaseClick(i);
   }
+  // 🔥 NOUVELLE LOGIQUE : OPA libre pendant son tour
+  const idx = window.currentTurn;
+  const data = boardData[i];
+
+  // Seulement sur entreprise
+  if (!data.type) {
+
+    const shares = window.corporateShares[i];
+    const myShares = shares.filter(x => x === idx).length;
+    const otherTeams = [...new Set(shares.filter(x => x !== idx))];
+
+    // Condition : je possède au moins 1 part ET au moins une autre équipe aussi
+    if (myShares >= 1 && otherTeams.length >= 1) {
+
+      let html = `
+        <p style="font-size:1.5rem">
+          Vous souhaitez lancer une OPA sur <b>${data.name}</b>.
+        </p>
+      `;
+
+      otherTeams.forEach(t => {
+        html += `
+          <button class="btn-action"
+                  style="background:${window.teams[t].color}"
+                  onclick="window.negoStep1(${idx}, ${i}, ${t})">
+            Attaquer ${window.teams[t].name}
+          </button>
+        `;
+      });
+
+      html += `
+        <button class="btn-action"
+                style="background:#64748b"
+                onclick="window.closeModal()">
+          Annuler
+        </button>
+      `;
+
+      window.openModal("🤝 OPA LIBRE", html);
+      return;
+    }
+  }
 
   // comportement normal : recap
   const s = window.corporateShares[i]; 
