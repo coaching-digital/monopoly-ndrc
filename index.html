@@ -741,12 +741,26 @@ window.finishGame = () => {
       ? "Victoire au nombre d'entreprises complètes"
       : "Aucune entreprise complète : victoire au nombre total de parts";
 
-  let html = `
-    <div style="background:#f1c40f;color:#1e293b;padding:25px;font-size:2.5rem;font-weight:900;border-radius:15px;margin-bottom:15px;text-transform:uppercase;">
-      ${winners.length > 1 ? "ÉGALITÉ !" : `VICTOIRE : ${winners[0].name.toUpperCase()} !`}
-    </div>
-    <div style="color:#475569;font-weight:900;margin-bottom:25px;">${subtitle}</div>
-  `;
+ const winnerColor = winners.length === 1 ? winners[0].color : "#f1c40f";
+
+let html = `
+  <div style="
+      background:${winnerColor};
+      color:white;
+      padding:25px;
+      font-size:2.5rem;
+      font-weight:900;
+      border-radius:15px;
+      margin-bottom:15px;
+      text-transform:uppercase;
+  ">
+    ${winners.length > 1 ? "ÉGALITÉ !" : `VICTOIRE : ${winners[0].name.toUpperCase()} !`}
+  </div>
+  <div style="color:#475569;font-weight:900;margin-bottom:25px;">
+    ${subtitle}
+  </div>
+`;
+
 
   // Affichage des scores
   window.teams.forEach((t, i) => {
