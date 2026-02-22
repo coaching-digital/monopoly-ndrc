@@ -971,8 +971,8 @@ window.rollDice = async (idx) => {
   if (idx !== window.currentTurn || window.isMoving) return;
   if (window.liquidationMode) return;
   if (window.liquidationMode && idx === window.liquidationTeamIdx) return;
-  if (window.teams[idx].capital <= 0) return;
-
+// Une équipe en négatif peut quand même jouer
+  
   if (!window.gameStarted) {
     window.gameStarted = true;
     window.startGlobalTimer();
@@ -1150,6 +1150,15 @@ else {
   };
 
   window.triggerMS = (idx, p) => {
+    if (window.teams[idx].capital <= 0) {
+  window.openModal("⛔ MORT SUBITE BLOQUÉE", `
+    <p style="font-size:1.5rem;color:#ef4444;font-weight:900;">
+      Vous ne pouvez pas lancer une Mort Subite avec un capital négatif.
+    </p>
+    <button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">OK</button>
+  `);
+  return;
+}
     let h = `<p style="font-size:1.5rem">Qui défiez-vous ? (-${p*100}%)</p>`;
 window.teams.forEach((t, i) => { if(i !== idx && t.capital > 0) h += `<button class="btn-action" style="background:${t.color}" onclick="window.msStep2(${idx}, ${i}, ${p})">${t.name}</button>`; });
     window.openModal("💀 MORT SUBITE", h);
@@ -1210,6 +1219,15 @@ if (shares.length < 3 && !justBought)
 // ============================================================
 
 window.buyShareQuiz = (idx, pos) => {
+  if (window.teams[idx].capital <= 0) {
+  window.openModal("⛔ INVESTISSEMENT BLOQUÉ", `
+    <p style="font-size:1.5rem;color:#ef4444;font-weight:900;">
+      Vous ne pouvez pas acheter tant que votre capital est négatif.
+    </p>
+    <button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">OK</button>
+  `);
+  return;
+}
   // Vérif fonds AVANT de poser la question (sinon ça frustre)
   const price = boardData[pos].price;
   if (window.teams[idx].capital < price) {
