@@ -480,22 +480,33 @@ window.resolveLiquidation = (teamIdx, pos, success) => {
 
   window.updateUI();
 
-  // encore en faillite ?
+ // encore en faillite ?
 if (isBankrupt(teamIdx)) {
 
   const owned = teamOwnedPositions(teamIdx);
 
-  // plus aucune part à vendre → crédit obligatoire
-  if (!owned.length) {
+  // 🔥 Plus aucune part → crédit obligatoire
+  if (owned.length === 0) {
+
+    window.liquidationMode = false;
+    window.liquidationTeamIdx = null;
+    window.liquidationAwaitPick = false;
+
     window.triggerForcedCredit(teamIdx);
     return;
   }
 
-  // sinon on continue liquidation normale
+  // Sinon continuer liquidation obligatoire
   window.openModal("✅ PART VENDUE", `
     <p style="font-size:1.4rem;">+${gain}€</p>
-    <p style="color:#ef4444;font-weight:900;">Toujours en faillite : vendez encore.</p>
-    <button class="btn-action" style="background:var(--vert)" onclick="window.beginLiquidationPick()">VENDRE UNE AUTRE PART</button>
+    <p style="color:#ef4444;font-weight:900;">
+      Toujours en faillite : vous devez vendre une autre part.
+    </p>
+    <button class="btn-action"
+      style="background:var(--vert)"
+      onclick="window.beginLiquidationPick()">
+      VENDRE UNE AUTRE PART
+    </button>
   `);
   return;
 }
