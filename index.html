@@ -991,17 +991,37 @@ window.rollDice = async (idx) => {
     diceEl.classList.remove('dice-rolling'); diceEl.innerText = roll;
 
     for (let i = 0; i < roll; i++) {
-      team.pos = (team.pos + 1) % 40;
-      if (team.pos === 0) {
-        let val = 0; window.corporateShares.forEach((arr, p) => { if(arr.includes(idx)) val += (boardData[p].price || 0); });
-        team.capital += Math.floor((team.capital + val) * 0.10);
-      }
-      window.updatePawnVisual(idx, team.pos); await new Promise(r => setTimeout(r, 150));
+
+    team.pos = (team.pos + 1) % 40;
+
+    if (team.pos === 0) {
+        team.capital += 500;
+
+        window.openModal("🚀 PASSAGE PAR DÉPART", `
+            <p style="font-size:1.8rem;font-weight:900;color:#22c55e">
+                +500€
+            </p>
+        `);
     }
+
+    window.updatePawnVisual(idx, team.pos);
+    await new Promise(r => setTimeout(r, 150));
+}
 
     window.isMoving = false;
 
     const data = boardData[team.pos];
+  // 🎁 Si on s'arrête sur DÉPART
+if (data.name === "DÉPART") {
+    team.capital += 1000;
+    window.openModal("🚀 DÉPART", `
+        <p style="font-size:1.8rem;font-weight:900;color:#22c55e">
+            +1000€
+        </p>
+    `);
+    window.updateUI();
+    return;
+}
     if (data.name === "POLICE") {
   team.pos = 10;
   team.prison = 1;
