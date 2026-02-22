@@ -1571,6 +1571,41 @@ if (data.type === "commu") {
   );
   return;
 }
+  // 🔥 RÈGLES PRISON
+if (data.type === "prison") {
+  window.openModal(
+    "PRISON 👮",
+    `<p style="font-size:1.6rem">
+      Si vous êtes envoyé ici, vous perdez <b>1 tour</b>.<br>
+      Vous ne pouvez pas lancer le dé pendant ce tour.
+    </p>`
+  );
+  return;
+}
+
+// 🔥 RÈGLES POLICE
+if (data.name === "POLICE") {
+  window.openModal(
+    "POLICE 🚓",
+    `<p style="font-size:1.6rem">
+      🚨 FRAUDE détectée !<br>
+      Vous êtes envoyé directement en <b>PRISON</b> et perdez 1 tour.
+    </p>`
+  );
+  return;
+}
+
+// 🔥 RÈGLES PARC
+if (data.name === "PARC") {
+  window.openModal(
+    "PARC 🌳",
+    `<p style="font-size:1.6rem">
+      Vous récupérez l’intégralité de la <b>cagnotte communauté</b>.<br>
+      Les pénalités des cartes COMMUNAUTÉ et CHANCE alimentent cette cagnotte.
+    </p>`
+  );
+  return;
+}
   const s = window.corporateShares[i];
 
 if (s.length === 0) {
