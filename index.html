@@ -1148,7 +1148,7 @@ else {
 
   window.triggerMS = (idx, p) => {
     let h = `<p style="font-size:1.5rem">Qui défiez-vous ? (-${p*100}%)</p>`;
-    window.teams.forEach((t, i) => { if(i !== idx) h += `<button class="btn-action" style="background:${t.color}" onclick="window.msStep2(${idx}, ${i}, ${p})">${t.name}</button>`; });
+window.teams.forEach((t, i) => { if(i !== idx && t.capital > 0) h += `<button class="btn-action" style="background:${t.color}" onclick="window.msStep2(${idx}, ${i}, ${p})">${t.name}</button>`; });
     window.openModal("💀 MORT SUBITE", h);
   };
 
