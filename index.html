@@ -212,7 +212,7 @@ textarea {
 
       <div class="game-timer-display" id="global-timer">01:00:00</div>
       <button class="end-game-btn" onclick="window.finishGame()">🏁 FINIR LA PARTIE</button>
-      <p style="text-align:center; color:#000000; margin-top:10px;">Au tour de : <b id="current-team-display" style="color:white;">-</b></p>
+      <p style="text-align:center; color:#FFFFFF; margin-top:10px;">Au tour de : <b id="current-team-display" style="color:white;">-</b></p>
     </div>
   </div>
 </div>
@@ -565,6 +565,9 @@ if (isBankrupt(teamIdx)) {
       Vous êtes en cessation de paiement.<br>
       Un crédit bancaire est obligatoire.
     </p>
+    <p style="font-size:1.6rem;font-weight:900;color:#ef4444;">
+  Capital actuel : ${team.capital}€
+</p>
 
     <p style="margin-top:20px;font-weight:900;">
       Choisissez un montant :
