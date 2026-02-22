@@ -483,7 +483,8 @@ window.resolveLiquidation = (teamIdx, pos, success) => {
   window.teams[teamIdx].capital += gain;
 
   window.updateUI();
-
+console.log("Encore en faillite ?", isBankrupt(teamIdx));
+console.log("Parts restantes :", teamOwnedPositions(teamIdx).length);
  // encore en faillite ?
 if (isBankrupt(teamIdx)) {
 
