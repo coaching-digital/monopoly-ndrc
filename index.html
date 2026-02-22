@@ -1368,6 +1368,7 @@ window.openModal = (t, b) => {
 
   };
 
+  window.nextTurn = () => {
  window.currentTurn = (window.currentTurn + 1) % 4;
 
 // 🔥 SAUTER LES ÉQUIPES ÉLIMINÉES
@@ -1415,7 +1416,6 @@ if (team.debt > 0) {
   // 💰 liquidation optionnelle (<=500€)
   checkOptionalLiquidationAtTurnStart();
 };
-
 
 
 window.showRecap = (i) => {
