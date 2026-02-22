@@ -1560,6 +1560,16 @@ window.showRecap = (i) => {
   }
 
 // 🔥 RÈGLES SPÉCIALES POUR CASES NON-ENTREPRISES
+  if (data.name === "DÉPART") {
+  window.openModal(
+    "🚀 DÉPART",
+    `<p style="font-size:1.6rem">
+      🎁 Vous gagnez <b>500€</b> lorsque vous passez par cette case.<br><br>
+      💰 Vous gagnez <b>1000€</b> si vous vous arrêtez dessus.
+    </p>`
+  );
+  return;
+}
 if (data.type === "ms") {
   window.openModal(
     data.name,
