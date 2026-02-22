@@ -1476,7 +1476,40 @@ window.showRecap = (i) => {
       return;
     }
   }
+const data = boardData[i];
 
+// 🔥 RÈGLES SPÉCIALES POUR CASES NON-ENTREPRISES
+if (data.type === "ms") {
+  window.openModal(
+    data.name,
+    `<p style="font-size:1.6rem">
+      💀 Défiez une équipe pour récupérer <b>${data.val * 100}%</b> de sa cagnotte.
+    </p>`
+  );
+  return;
+}
+
+if (data.type === "chance") {
+  window.openModal(
+    "CHANCE 🍀",
+    `<p style="font-size:1.6rem">
+      Répondez correctement pour relancer le dé.<br>
+      Mauvaise réponse = malus financier.
+    </p>`
+  );
+  return;
+}
+
+if (data.type === "commu") {
+  window.openModal(
+    "COMMUNAUTÉ 🤝",
+    `<p style="font-size:1.6rem">
+      Carte aléatoire : bonus ou pénalité.<br>
+      Les pénalités alimentent la cagnotte du Parc.
+    </p>`
+  );
+  return;
+}
   const s = window.corporateShares[i];
 
 if (s.length === 0) {
