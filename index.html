@@ -719,12 +719,47 @@ window.takeCredit = (teamIdx, amount) => {
     window.liquidationSelected = new Set();
     window.updateUI();
 
-    window.openModal("✅ VENTE EFFECTUÉE", `
-      <p style="font-size:1.8rem;font-weight:900;color:#22c55e">+${totalRefund}€</p>
-      <p style="font-size:1.4rem">Capital actuel : <b>${window.teams[teamIdx].capital}€</b></p>
-      <button class="btn-action" style="background:#64748b" onclick="renderLiquidationModal()">Continuer</button>
-    `);
-  };
+   // 🔥 Vérification après vente
+if (isBankrupt(teamIdx)) {
+
+  const owned = teamOwnedPositions(teamIdx);
+
+  if (owned.length === 0) {
+    // plus rien à vendre → crédit obligatoire
+    window.exitLiquidation();
+    window.triggerForcedCredit(teamIdx);
+    return;
+  }
+
+  // encore des parts → continuer liquidation
+  window.openModal("⚠️ ENCORE EN FAILLITE", `
+    <p style="font-size:1.6rem;color:#ef4444;font-weight:900;">
+      Capital actuel : ${window.teams[teamIdx].capital}€
+    </p>
+    <p>Vous devez vendre d'autres parts.</p>
+    <button class="btn-action"
+      style="background:#22c55e"
+      onclick="renderLiquidationModal()">
+      CONTINUER
+    </button>
+  `);
+  return;
+}
+
+// ✅ Plus en faillite → sortie propre
+window.exitLiquidation();
+
+window.openModal("✅ LIQUIDATION RÉUSSIE", `
+  <p style="font-size:1.8rem;font-weight:900;color:#22c55e">
+    +${totalRefund}€
+  </p>
+  <p>Capital actuel : <b>${window.teams[teamIdx].capital}€</b></p>
+  <button class="btn-action"
+    style="background:#64748b"
+    onclick="window.closeModal()">
+    Continuer
+  </button>
+`);
 
   // Gestion clic plateau : en liquidation => sélection / sinon => recap
   window.handleBoardClick = (pos) => {
