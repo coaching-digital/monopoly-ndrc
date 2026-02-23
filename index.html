@@ -1577,11 +1577,27 @@ if (team.debt > 0) {
   window.updateUI();
   window.closeModal();
 
-  // 🔥 Vérification faillite BLOQUANTE
-  if (isBankrupt(window.currentTurn)) {
+ // 🔥 Vérification faillite BLOQUANTE
+if (isBankrupt(window.currentTurn)) {
+
+  const team = window.teams[window.currentTurn];
+  const owned = teamOwnedPositions(window.currentTurn);
+
+  // Si encore des parts → liquidation obligatoire
+  if (owned.length > 0) {
     startBankruptcyTurn(window.currentTurn);
     return;
   }
+
+  // Si plus de parts MAIS pas encore pris de crédit → crédit obligatoire
+  if (!team.hasUsedCredit) {
+    window.triggerForcedCredit(window.currentTurn);
+    return;
+  }
+
+  // Sinon : crédit déjà pris et toujours négatif
+  // 👉 On laisse jouer normalement
+}
 
   // 💰 liquidation optionnelle (<=500€)
   checkOptionalLiquidationAtTurnStart();
