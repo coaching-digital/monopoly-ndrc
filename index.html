@@ -996,8 +996,8 @@ let html = `
   };
 window.rollDice = async (idx) => {
   if (idx !== window.currentTurn || window.isMoving) return;
-  if (window.liquidationMode) return;
-  if (window.liquidationMode && idx === window.liquidationTeamIdx) return;
+  if (window.liquidationMode && idx !== window.liquidationTeamIdx) return;
+  
 // Une équipe en négatif peut quand même jouer
   
   if (!window.gameStarted) {
