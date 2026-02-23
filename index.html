@@ -995,8 +995,9 @@ let html = `
     p.style.top  = `${rect.top  + rect.height/2 - 17 + (idx*4)}px`;
   };
 window.rollDice = async (idx) => {
-  if (idx !== window.currentTurn || window.isMoving) return;
-  if (window.liquidationMode && idx !== window.liquidationTeamIdx) return;
+ if (idx !== window.currentTurn || window.isMoving) return;
+if (window.liquidationMode) return;
+if (window.liquidationMode && idx === window.liquidationTeamIdx) return;
   
 // Une équipe en négatif peut quand même jouer
   
