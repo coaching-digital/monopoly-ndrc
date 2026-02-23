@@ -1735,4 +1735,48 @@ dots += `</div>`;
 
 window.openModal(boardData[i].name, dots);
 };
+  window.showPedagogicalReport = () => {
+
+  let rows = "";
+
+  Object.keys(window.studentStats || {}).forEach(name => {
+    const s = window.studentStats[name];
+    const rate = s.total > 0
+      ? Math.round((s.correct / s.total) * 100)
+      : 0;
+
+    rows += `
+      <tr>
+        <td style="padding:8px;border-bottom:1px solid #ddd">${name}</td>
+        <td style="text-align:center">${s.correct}</td>
+        <td style="text-align:center">${s.total}</td>
+        <td style="text-align:center;font-weight:900">${rate}%</td>
+      </tr>
+    `;
+  });
+
+  window.openModal("📊 BILAN PÉDAGOGIQUE", `
+    <div style="max-height:400px;overflow:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:1.1rem">
+        <thead>
+          <tr style="background:#f1f5f9">
+            <th style="padding:8px;text-align:left">Étudiant</th>
+            <th>Bonnes</th>
+            <th>Total</th>
+            <th>Taux</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows}
+        </tbody>
+      </table>
+    </div>
+
+    <button class="btn-action"
+      style="background:#64748b;margin-top:20px"
+      onclick="window.closeModal()">
+      Fermer
+    </button>
+  `);
+};
 </script>
