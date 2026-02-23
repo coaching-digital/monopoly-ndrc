@@ -1743,7 +1743,7 @@ dots += `</div>`;
 
 window.openModal(boardData[i].name, dots);
 };
-  window.showPedagogicalReport = () => {
+ window.showPedagogicalReport = () => {
 
   let rows = "";
 
@@ -1755,28 +1755,32 @@ window.openModal(boardData[i].name, dots);
 
     rows += `
       <tr>
-        <td style="padding:8px;border-bottom:1px solid #ddd">${name}</td>
-        <td style="text-align:center">${s.correct}</td>
-        <td style="text-align:center">${s.total}</td>
-        <td style="text-align:center;font-weight:900">${rate}%</td>
+        <td style="padding:8px;border-bottom:1px solid #ddd;">${name}</td>
+        <td style="text-align:center;border-bottom:1px solid #ddd;">${s.correct}</td>
+        <td style="text-align:center;border-bottom:1px solid #ddd;">${s.total}</td>
+        <td style="text-align:center;border-bottom:1px solid #ddd;font-weight:700;">${rate}%</td>
       </tr>
     `;
   });
 
   window.openModal("📊 BILAN PÉDAGOGIQUE", `
     <div style="max-height:400px;overflow:auto">
-    <table style="width:100%;border-collapse:collapse;font-size:1.1rem;color:#000;">
+
+      <table style="width:100%;border-collapse:collapse;font-size:1.1rem;color:#000;">
+
         <thead>
-        <tr style="background:#f1f5f9;color:#000;">
-            <th style="padding:8px;text-align:left">Étudiant</th>
+          <tr style="background:#f1f5f9;color:#000;">
+            <th style="padding:8px;text-align:left;">Étudiant</th>
             <th>Bonnes</th>
             <th>Total</th>
             <th>Taux</th>
           </tr>
         </thead>
+
         <tbody>
           ${rows}
         </tbody>
+
       </table>
     </div>
 
@@ -1785,11 +1789,12 @@ window.openModal(boardData[i].name, dots);
       onclick="window.closeModal()">
       Fermer
     </button>
+
     <button class="btn-action"
-  style="background:#22c55e;margin-top:10px"
-  onclick="window.downloadPedagogicalPDF()">
-  📄 Télécharger PDF
-</button>
+      style="background:#22c55e;margin-top:10px"
+      onclick="window.downloadPedagogicalPDF()">
+      📄 Télécharger PDF
+    </button>
   `);
 };
 </script>
