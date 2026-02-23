@@ -248,6 +248,9 @@ hasUsedCredit: false,
 eliminated: false,
 }
   ];
+  // 📊 Statistiques pédagogiques
+window.studentStats = {};
+window.lastStudent = null;
 
   window.initGame = () => {
     ['input-rouge', 'input-bleu', 'input-vert', 'input-jaune'].forEach((id, idx) => {
@@ -258,7 +261,15 @@ eliminated: false,
     // On garde l'écran joueurs tel quel, puis on affiche l'écran de thème
     document.getElementById('setup-overlay').style.display = 'none';
     document.getElementById('theme-overlay').classList.remove('hidden');
+// Initialisation des stats étudiants
+window.studentStats = {};
 
+window.teams.forEach(team => {
+  team.players.forEach(player => {
+    const name = player.toUpperCase();
+    window.studentStats[name] = { correct: 0, total: 0 };
+  });
+});
     window.updateUI();
   };
 
@@ -939,9 +950,15 @@ let html = `
       </div>`;
   });
 
-  html += `
+ html += `
     <button onclick="window.location.reload()" style="background:#22c55e;color:white;padding:15px 40px;font-size:1.5rem;font-weight:900;border-radius:50px;cursor:pointer;margin-top:20px;border:none;">
       NOUVELLE PARTIE
+    </button>
+
+    <br><br>
+
+    <button onclick="window.showPedagogicalReport()" style="background:#1e293b;color:white;padding:15px 40px;font-size:1.2rem;font-weight:900;border-radius:50px;cursor:pointer;border:none;">
+      📊 VOIR TABLEAU PÉDAGOGIQUE
     </button>
   `;
 
@@ -1095,6 +1112,7 @@ if (data.name === "DÉPART") {
 };
   window.triggerChance = (idx) => {
     const student = getRandomStudent(idx);
+    window.lastStudent = student.toUpperCase();
     window.openModal("⚠️ QUESTION CHANCE", `<p style="font-size:1.5rem">La question est pour :</p><div class="student-badge">👉 ${student}</div><button class="btn-action" style="background:var(--vert)" onclick="window.launchChance(${idx})">JE SUIS PRÊT(E) ➤</button>`);
   };
 
@@ -1112,6 +1130,14 @@ if (data.name === "DÉPART") {
   };
 
   window.resolveChance = (idx, success) => {
+    // 📊 Mise à jour stats étudiant
+const s = window.lastStudent;
+if (s && window.studentStats[s]) {
+  window.studentStats[s].total++;
+  if (success) {
+    window.studentStats[s].correct++;
+  }
+}
     clearInterval(window.questionTimer);
     if (success) window.openModal("BRAVO ! 👏", `<div style="font-size:2.5rem;font-weight:900;color:var(--vert)">RÉPONSE JUSTE !</div><p>Relancez le dé immédiatement.</p><button class="btn-action" style="background:var(--vert)" onclick="window.closeModal()">RELANCER</button>`);
 else {
@@ -1166,6 +1192,7 @@ window.teams.forEach((t, i) => { if(i !== idx && t.capital > 0) h += `<button cl
 
   window.msStep2 = (att, def, p) => {
     const student = getRandomStudent(att);
+    window.lastStudent = student.toUpperCase();
     window.openModal("⚠️ DÉFI", `<p style="font-size:1.5rem">L'attaque est menée par :</p><div class="student-badge">👉 ${student}</div><button class="btn-action" style="background:var(--rouge)" onclick="window.launchMs(${att}, ${def}, ${p})">LANCER ➤</button>`);
   };
 
@@ -1184,6 +1211,13 @@ window.teams.forEach((t, i) => { if(i !== idx && t.capital > 0) h += `<button cl
   };
 
   window.resolveMS = (att, def, p, success) => {
+    // 📊 Stats pédagogiques
+if (window.lastStudent && window.studentStats[window.lastStudent]) {
+    window.studentStats[window.lastStudent].total++;
+    if (success) {
+        window.studentStats[window.lastStudent].correct++;
+    }
+}
     clearInterval(window.questionTimer);
     const amount = Math.floor(window.teams[att].capital * p);
     if(success) {
@@ -1237,6 +1271,7 @@ window.buyShareQuiz = (idx, pos) => {
   }
 
   const student = getRandomStudent(idx);
+  window.lastStudent = student.toUpperCase();
 
   window.openModal(
     "🧠 QUESTION AVANT ACHAT",
@@ -1263,6 +1298,14 @@ window.launchBuyShareQuiz = (idx, pos) => {
 };
 
 window.resolveBuyShareQuiz = (idx, pos, success) => {
+  // 📊 Mise à jour stats étudiant
+const s = window.lastStudent;
+if (s && window.studentStats[s]) {
+  window.studentStats[s].total++;
+  if (success) {
+    window.studentStats[s].correct++;
+  }
+}
   clearInterval(window.questionTimer);
 
   if (!success) {
@@ -1301,6 +1344,7 @@ window.buyShareAfterQuiz = (idx, pos) => {
 
   window.negoStep1 = (att, pos, def) => {
   const student = getRandomStudent(att);
+    window.lastStudent = student.toUpperCase();
 
   window.openModal(
     "⚠️ OPA",
@@ -1376,6 +1420,7 @@ window.negoStep3 = (att, def, pos) => {
   }
 
   const student = getRandomStudent(def);
+  window.lastStudent = student.toUpperCase();
 
   window.openModal(
     "⚠️ DÉFENSE",
