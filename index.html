@@ -1568,10 +1568,10 @@ if (team.debt > 0) {
   }
 
   // nouvelle faillite pendant remboursement → élimination
-  if (team.capital <= 0) {
-    window.eliminateTeam(window.currentTurn);
-    return;
-  }
+ if (team.capital <= 0) {
+  // On laisse l'équipe continuer à jouer même négative
+  // Pas d'élimination automatique
+}
 }
 
   window.updateUI();
