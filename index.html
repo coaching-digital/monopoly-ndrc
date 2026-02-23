@@ -1797,6 +1797,38 @@ window.openModal(boardData[i].name, dots);
     </button>
   `);
 };
+  window.downloadPedagogicalPDF = () => {
+
+  if (!window.jspdf) {
+    alert("La librairie PDF ne s'est pas chargée.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  const today = new Date().toLocaleDateString();
+
+  doc.setFontSize(18);
+  doc.text("BILAN PÉDAGOGIQUE", 20, 20);
+
+  doc.setFontSize(12);
+  doc.text("Date : " + today, 20, 30);
+
+  let y = 45;
+
+  Object.keys(window.studentStats || {}).forEach(name => {
+    const s = window.studentStats[name];
+    const rate = s.total > 0
+      ? Math.round((s.correct / s.total) * 100)
+      : 0;
+
+    doc.text(`${name} - ${s.correct}/${s.total} (${rate}%)`, 20, y);
+    y += 10;
+  });
+
+  doc.save("Bilan_pedagogique.pdf");
+};
 </script>
   </head>
 </html>
