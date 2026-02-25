@@ -1230,14 +1230,35 @@ if (window.lastStudent && window.studentStats[window.lastStudent]) {
     }
 }
     clearInterval(window.questionTimer);
-const amount = Math.floor(window.teams[def].capital * p);
-    if(success) {
-      window.teams[def].capital -= amount; window.teams[att].capital += amount;
-      document.getElementById('modal-body').innerHTML = `<div style="font-size:2.5rem;font-weight:900;color:var(--vert)">DÉFI RÉUSSI !</div><div style="font-size:4rem;font-weight:900;">+${amount}€</div><button class="btn-action" onclick="window.nextTurn()">OK</button>`;
-    } else {
-      window.teams[att].capital -= amount; window.teams[def].capital += amount;
-      document.getElementById('modal-body').innerHTML = `<div style="font-size:2.5rem;font-weight:900;color:var(--rouge)">DÉFI RATÉ...</div><div style="font-size:4rem;font-weight:900;">-${amount}€</div><button class="btn-action" onclick="window.nextTurn()">OK</button>`;
-    }
+const amountDef = Math.floor(window.teams[def].capital * p);
+const amountAtt = Math.floor(window.teams[att].capital * p);
+
+if (success) {
+  // Défense réussie → le défenseur gagne % du capital de l’attaquant
+  window.teams[att].capital -= amountAtt;
+  window.teams[def].capital += amountAtt;
+  document.getElementById('modal-body').innerHTML =
+    `<div style="font-size:2.5rem;font-weight:900;color:var(--vert)">
+       DÉFENSE RÉUSSIE !
+     </div>
+     <div style="font-size:4rem;font-weight:900;">
+       +${amountAtt}€
+     </div>
+     <button class="btn-action" onclick="window.nextTurn()">OK</button>`;
+} else {
+  // Défense échouée → le défenseur perd % de SON capital
+  window.teams[def].capital -= amountDef;
+  window.teams[att].capital += amountDef;
+
+  document.getElementById('modal-body').innerHTML =
+    `<div style="font-size:2.5rem;font-weight:900;color:var(--rouge)">
+       DÉFENSE RATÉE !
+     </div>
+     <div style="font-size:4rem;font-weight:900;">
+       -${amountDef}€
+     </div>
+     <button class="btn-action" onclick="window.nextTurn()">OK</button>`;
+}
   };
 
   window.triggerInvest = (idx, pos, justBought=false) => {
