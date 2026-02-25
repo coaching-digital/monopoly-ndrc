@@ -385,7 +385,8 @@ window.teams.forEach(team => {
 
     // On ferme l'overlay thème, on arrive au plateau
     document.getElementById('theme-overlay').classList.add('hidden');
-    window.updateUI();
+window.currentTurn = 0;
+window.updateUI();
   };
 
   function getUniqueQuestion() {
