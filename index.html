@@ -1138,8 +1138,82 @@ if (data.name === "DÉPART") {
 } else if (data.type === 'chance') {
   window.triggerChance(idx);
 
-} else if (!data.type) {
-  window.triggerInvest(idx, team.pos);
+else if (!data.type) {
+
+  const pos = team.pos;
+  const shares = window.corporateShares[pos];
+  const price = boardData[pos].price;
+
+  // Aucune part vendue → comportement normal
+  if (shares.length === 0) {
+    window.triggerInvest(idx, pos);
+    return;
+  }
+
+  // Comptage des parts par équipe
+  const distribution = {};
+  shares.forEach(owner => {
+    if (!distribution[owner]) distribution[owner] = 0;
+    distribution[owner]++;
+  });
+
+  let totalRentPaid = 0;
+
+  Object.keys(distribution).forEach(owner => {
+
+    const ownerIdx = parseInt(owner);
+    const partsOwned = distribution[ownerIdx];
+
+    // Ne pas payer sur ses propres parts
+    if (ownerIdx === idx) return;
+
+    let rent = 0;
+
+    if (partsOwned === 1) {
+      rent = Math.floor(price * 0.30);
+    }
+    else if (partsOwned === 2) {
+      rent = Math.floor((price * 2) * 0.40);
+    }
+    else if (partsOwned === 3) {
+      rent = Math.floor((price * 3) * 0.50);
+    }
+
+    window.teams[idx].capital -= rent;
+    window.teams[ownerIdx].capital += rent;
+
+    totalRentPaid += rent;
+  });
+
+  window.updateUI();
+
+  // Si le joueur possède au moins 1 part → possibilité d’acheter ensuite
+  if (shares.includes(idx)) {
+
+    window.openModal("💸 LOYER PAYÉ",
+      `<p style="font-size:1.6rem">
+        Vous avez payé <b>${totalRentPaid}€</b> de loyer.
+      </p>
+      <button class="btn-action"
+              style="background:var(--vert)"
+              onclick="window.triggerInvest(${idx}, ${pos})">
+        CONTINUER
+      </button>`
+    );
+
+  } else {
+
+    window.openModal("💸 LOYER PAYÉ",
+      `<p style="font-size:1.6rem">
+        Vous avez payé <b>${totalRentPaid}€</b> de loyer.
+      </p>
+      <button class="btn-action"
+              onclick="window.nextTurn()">
+        OK
+      </button>`
+    );
+  }
+}
 
 } else {
   window.nextTurn();
