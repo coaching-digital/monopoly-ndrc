@@ -1500,16 +1500,23 @@ window.updateUI();
   };
 
   window.triggerInvest = (idx, pos, justBought=false) => {
-    const data = boardData[pos]; const shares = window.corporateShares[pos];
-    let h = `<p style="font-size:1.5rem">Parts vendues : ${shares.length}/3</p>`;
-if (shares.length < 3 && !justBought)
- h += `<button class="btn-action" style="background:var(--vert)" onclick="window.buyShareQuiz(${idx}, ${pos})">Acheter 1 part (${data.price}€)</button>`;
-    if (shares.filter(t => t === idx).length >= 1 && shares.filter(t => t !== idx).length >= 1)
-      h += `<div style="border-top:2px dashed #cbd5e1;margin-top:20px;padding-top:10px;"><p style="color:#0ea5e9;font-weight:900;font-size:1.8rem">🤝 NÉGOCIATION</p><select id="nego-target" style="width:100%;padding:15px;font-size:1.3rem;margin-bottom:15px;">${[...new Set(shares)].filter(t=>t!==idx).map(t => `<option value="${t}">Équipe ${window.teams[t].name}</option>`).join('')}</select><button class="btn-action" style="background:#f59e0b" onclick="window.negoStep1(${idx}, ${pos}, parseInt(document.getElementById('nego-target').value))">Lancer OPA</button>
-</div>`;
-    h += `<button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">Fin du tour</button>`;
-    window.openModal(data.name, h);
-  };
+
+  const student = getRandomStudent(idx);
+  window.lastStudent = student.toUpperCase();
+
+  window.openModal("🧠 QUESTION AVANT ACHAT",
+    `<p style="font-size:1.5rem">La question est pour :</p>
+     <div class="student-badge"
+          style="background: var(--${window.teams[idx].name.toLowerCase()})">
+        👉 ${student}
+     </div>
+     <button class="btn-action"
+             style="background:var(--vert)"
+             onclick="window.buyShareQuiz(${idx}, ${pos})">
+        JE SUIS PRÊT(E) ➤
+     </button>`
+  );
+};
 
   window.buyShare = (idx, pos) => {
     if(window.teams[idx].capital >= boardData[pos].price) {
