@@ -1190,11 +1190,50 @@ if (data.name === "DÉPART") {
   const myShares = shares.filter(x => x === idx).length;
   const otherTeams = [...new Set(shares.filter(x => x !== idx))];
 
-  // 3️⃣ S’il reste des parts → achat classique
-  if (shares.length < 3) {
-    window.triggerInvest(idx, pos);
+ // 3️⃣ S’il reste des parts
+if (shares.length < 3) {
+
+  // Si moi + autre équipe → OPA possible aussi
+  if (myShares >= 1 && otherTeams.length >= 1) {
+
+    let html = `
+      <p style="font-size:1.6rem">
+        Vous possédez déjà une part.<br>
+        Voulez-vous lancer une OPA ou acheter ?
+      </p>
+      <button class="btn-action"
+        style="background:var(--vert)"
+        onclick="window.triggerInvest(${idx}, ${pos})">
+        Acheter une part
+      </button>
+    `;
+
+    otherTeams.forEach(t => {
+      html += `
+        <button class="btn-action"
+          style="background:${window.teams[t].color}"
+          onclick="window.negoStep1(${idx}, ${pos}, ${t})">
+          Attaquer ${window.teams[t].name}
+        </button>
+      `;
+    });
+
+    html += `
+      <button class="btn-action"
+        style="background:#64748b"
+        onclick="window.nextTurn()">
+        Fin du tour
+      </button>
+    `;
+
+    window.openModal("🤝 CHOIX STRATÉGIQUE", html);
     return;
   }
+
+  // Sinon achat normal
+  window.triggerInvest(idx, pos);
+  return;
+}
 
   // 4️⃣ Toutes les parts vendues → OPA si je possède une part
   if (myShares >= 1 && otherTeams.length >= 1) {
