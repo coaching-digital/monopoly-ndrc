@@ -1256,7 +1256,8 @@ const amountAtt = Math.floor(window.teams[att].capital * p);
 if (success) {
   // Défense réussie → le défenseur gagne % du capital de l’attaquant
   window.teams[att].capital -= amountAtt;
-  window.teams[def].capital += amountAtt;
+window.teams[def].capital += amountAtt;
+window.updateUI();
   document.getElementById('modal-body').innerHTML =
     `<div style="font-size:2.5rem;font-weight:900;color:var(--vert)">
        DÉFENSE RÉUSSIE !
