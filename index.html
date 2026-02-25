@@ -1333,8 +1333,8 @@ if (shares.length < 3) {
     window.openModal("CHANCE 🍀",
       `<div id="timer-val" class="timer-box">30s</div>
        <div class="quiz-box">${q}</div>
-       <button class="btn-action" style="background:var(--vert)" onclick="window.resolveChance(${idx}, true)">OUI (Relancer)</button>
-       <button class="btn-action" style="background:var(--rouge)" onclick="window.resolveChance(${idx}, false)">NON (Malus)</button>`
+       <button class="btn-action" style="background:var(--vert)" onclick="window.resolveChance(${idx}, true)">OUI</button>
+       <button class="btn-action" style="background:var(--rouge)" onclick="window.resolveChance(${idx}, false)">NON</button>`
     );
     window.startQTimer(30, () => window.resolveChance(idx, false));
   };
@@ -1355,7 +1355,6 @@ if (success) {
     { type: "money", val: 500, label: "Vous remportez 500€" },
     { type: "loan", val: 1000, label: "Prêt sans intérêt de 1000€" },
     { type: "steal", val: 200, label: "Volez 200€ à une équipe" },
-    { type: "reroll", label: "Relancez le dé" },
     { type: "block", label: "Bloquez une équipe pour 1 tour" }
   ];
 
