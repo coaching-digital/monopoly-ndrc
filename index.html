@@ -261,6 +261,8 @@ eliminated: false,
   // 📊 Statistiques pédagogiques
 window.studentStats = {};
 window.lastStudent = null;
+  // 🎒 Sac de tirage équitable par équipe
+window.studentBags = {};
 
   window.initGame = () => {
     ['input-rouge', 'input-bleu', 'input-vert', 'input-jaune'].forEach((id, idx) => {
@@ -274,6 +276,13 @@ window.lastStudent = null;
 // Initialisation des stats étudiants
 window.studentStats = {};
 
+// 🎒 Initialisation des sacs de tirage équitable
+window.studentBags = {};
+
+window.teams.forEach((team, idx) => {
+  window.studentBags[idx] = [...team.players];
+});
+
 window.teams.forEach(team => {
   team.players.forEach(player => {
     const name = player.toUpperCase();
@@ -283,10 +292,21 @@ window.teams.forEach(team => {
     window.updateUI();
   };
 
-  function getRandomStudent(teamIdx) {
-    const players = window.teams[teamIdx].players;
-    return players[Math.floor(Math.random() * players.length)].toUpperCase();
+ function getRandomStudent(teamIdx) {
+
+  // Si le sac n'existe pas ou est vide → on le reconstruit
+  if (!window.studentBags[teamIdx] || window.studentBags[teamIdx].length === 0) {
+    window.studentBags[teamIdx] = [...window.teams[teamIdx].players];
   }
+
+  const bag = window.studentBags[teamIdx];
+
+  // On tire un élève au hasard dans le sac
+  const randomIndex = Math.floor(Math.random() * bag.length);
+  const student = bag.splice(randomIndex, 1)[0];
+
+  return student.toUpperCase();
+}
 
   // ============================================================
   // QUESTIONS : chargement CSV (selon thème choisi)
