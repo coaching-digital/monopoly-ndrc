@@ -1194,6 +1194,71 @@ shares.forEach(ownerIdx => {
   window.nextTurn();
 }
 };
+  window.stealShareStep2 = (attackerIdx, targetIdx) => {
+
+  let html = `<p style="font-size:1.6rem">Choisissez la part à voler :</p>`;
+
+  window.corporateShares.forEach((owners, pos) => {
+    if (owners.includes(targetIdx)) {
+      html += `
+        <button class="btn-action"
+                style="background:#64748b"
+                onclick="window.stealShareDefense(${attackerIdx}, ${targetIdx}, ${pos})">
+          ${boardData[pos].name}
+        </button>`;
+    }
+  });
+
+  window.openModal("🏢 CHOIX DE LA PART", html);
+};
+  window.stealShareDefense = (attackerIdx, targetIdx, pos) => {
+
+  const q = ensureQuestionOrPrompt();
+  if (!q) return;
+
+  window.openModal("🛡️ DÉFENSE", `
+    <div class="quiz-box">${q}</div>
+    <button class="btn-action"
+            style="background:var(--vert)"
+            onclick="window.resolveStealShare(${attackerIdx}, ${targetIdx}, ${pos}, true)">
+      JUSTE
+    </button>
+    <button class="btn-action"
+            style="background:var(--rouge)"
+            onclick="window.resolveStealShare(${attackerIdx}, ${targetIdx}, ${pos}, false)">
+      FAUX
+    </button>
+  `);
+};
+  window.resolveStealShare = (attackerIdx, targetIdx, pos, success) => {
+
+  if (success) {
+    window.openModal("🛡️ DÉFENSE RÉUSSIE",
+      `<p style="font-size:1.6rem">
+        La part est protégée !
+      </p>
+      <button class="btn-action" onclick="window.nextTurn()">OK</button>`
+    );
+    return;
+  }
+
+  const owners = window.corporateShares[pos];
+  const index = owners.indexOf(targetIdx);
+
+  if (index > -1) {
+    owners.splice(index, 1);
+    owners.push(attackerIdx);
+  }
+
+  window.updateUI();
+
+  window.openModal("🏢 PART VOLÉE",
+    `<p style="font-size:1.6rem">
+      Vous avez volé une part de ${boardData[pos].name} !
+    </p>
+    <button class="btn-action" onclick="window.nextTurn()">OK</button>`
+  );
+};
   window.afterRent = (idx, pos) => {
 
   const shares = window.corporateShares[pos];
@@ -1351,12 +1416,14 @@ if (s && window.studentStats[s]) {
     clearInterval(window.questionTimer);
 if (success) {
 
-  const rewards = [
-    { type: "money", val: 500, label: "Vous remportez 500€" },
-    { type: "loan", val: 1000, label: "Prêt sans intérêt de 1000€" },
-    { type: "steal", val: 200, label: "Volez 200€ à une équipe" },
-    { type: "block", label: "Bloquez une équipe pour 1 tour" }
-  ];
+const rewards = [
+  { type: "money", val: 500, label: "Vous remportez 500€" },
+  { type: "loan", val: 1000, label: "Prêt sans intérêt de 1000€" },
+  { type: "steal", val: 200, label: "Volez 200€ à une équipe" },
+  { type: "stealShare", label: "Volez une part à une équipe" },
+  { type: "reroll", label: "Relancez le dé" },
+  { type: "block", label: "Bloquez une équipe pour 1 tour" }
+];
 
   const reward = rewards[Math.floor(Math.random() * rewards.length)];
 
@@ -1405,6 +1472,30 @@ if (success) {
 
     window.openModal("🕵️ VOL", html);
   }
+    else if (reward.type === "stealShare") {
+
+  let html = `<p style="font-size:1.6rem">Choisissez une équipe à attaquer :</p>`;
+
+  window.teams.forEach((t, i) => {
+    if (i !== idx && !t.eliminated) {
+
+      const hasShares = window.corporateShares.some(shares =>
+        shares.includes(i)
+      );
+
+      if (hasShares) {
+        html += `
+          <button class="btn-action"
+                  style="background:${t.color}"
+                  onclick="window.stealShareStep2(${idx}, ${i})">
+            ${t.name}
+          </button>`;
+      }
+    }
+  });
+
+  window.openModal("🏢 VOL DE PART", html);
+}
 
   else if (reward.type === "reroll") {
     window.openModal("🎲 RELANCE",
