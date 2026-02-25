@@ -1220,11 +1220,23 @@ else {
 window.teams.forEach((t, i) => { if(i !== idx && t.capital > 0) h += `<button class="btn-action" style="background:${t.color}" onclick="window.msStep2(${idx}, ${i}, ${p})">${t.name}</button>`; });
     window.openModal("💀 MORT SUBITE", h);
   };
-
   window.msStep2 = (att, def, p) => {
 const student = getRandomStudent(def);
     window.lastStudent = student.toUpperCase();
-    window.openModal("⚠️ DÉFI", `<p style="font-size:1.5rem">L'équipe ${window.teams[def].name} doit se défendre :</p><div class="student-badge">👉 ${student}</div><button class="btn-action" style="background:var(--rouge)" onclick="window.launchMs(${att}, ${def}, ${p})">LANCER ➤</button>`);
+   window.openModal("⚠️ DÉFI", `
+  <p style="font-size:1.5rem">
+    L'équipe ${window.teams[def].name} doit se défendre :
+  </p>
+  <div class="student-badge" 
+       style="background: var(--${window.teams[def].name.toLowerCase()})">
+    👉 ${student}
+  </div>
+  <button class="btn-action"
+          style="background: var(--rouge)"
+          onclick="window.launchMs(${att}, ${def}, ${p})">
+    LANCER ➤
+  </button>
+`);
   };
 
   window.launchMs = (att, def, p) => {
