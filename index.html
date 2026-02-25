@@ -1217,7 +1217,22 @@ else {
   return;
 }
     let h = `<p style="font-size:1.5rem">Qui défiez-vous ? (-${p*100}%)</p>`;
-window.teams.forEach((t, i) => { if(i !== idx && t.capital > 0) h += `<button class="btn-action" style="background:${t.color}" onclick="window.msStep2(${idx}, ${i}, ${p})">${t.name}</button>`; });
+window.teams.forEach((t, i) => {
+  if (i !== idx && t.capital > 0) {
+    h += `
+      <button class="btn-action"
+              style="background:${t.color}"
+              onclick="window.msStep2(${idx}, ${i}, ${p})">
+        <div style="font-size:1.4rem;font-weight:800;">
+          ${t.name}
+        </div>
+        <div style="font-size:1rem;margin-top:4px;opacity:0.9;">
+          ${t.capital.toLocaleString()}€
+        </div>
+      </button>
+    `;
+  }
+});
     window.openModal("💀 MORT SUBITE", h);
   };
   window.msStep2 = (att, def, p) => {
