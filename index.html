@@ -1520,12 +1520,34 @@ window.triggerInvest = (idx, pos) => {
 };
 
   window.buyShare = (idx, pos) => {
-    if(window.teams[idx].capital >= boardData[pos].price) {
-      window.teams[idx].capital -= boardData[pos].price;
-      window.corporateShares[pos].push(idx);
-      window.triggerInvest(idx, pos, true);
-    } else alert("Fonds insuffisants");
-    };
+
+  if (window.teams[idx].capital >= boardData[pos].price) {
+
+    window.teams[idx].capital -= boardData[pos].price;
+    window.corporateShares[pos].push(idx);
+
+    window.updateUI();
+
+    window.openModal(
+      "🏢 PART ACHETÉE",
+      `<p style="font-size:1.6rem">
+        Vous avez acheté 1 part de <b>${boardData[pos].name}</b>.
+      </p>
+      <button class="btn-action"
+              style="background:#64748b"
+              onclick="window.nextTurn()">
+        OK
+      </button>`
+    );
+
+  } else {
+
+    alert("Fonds insuffisants");
+    window.nextTurn();
+
+  }
+};
+  
     // ============================================================
 // ACHAT CLASSIQUE : question obligatoire avant achat
 // ============================================================
