@@ -1152,12 +1152,9 @@ if (data.name === "DÉPART") {
 
 shares.forEach(ownerIdx => {
   if (ownerIdx !== idx) {
-
     const rent = Math.floor(price * 0.30);
-
     window.teams[idx].capital -= rent;
     window.teams[ownerIdx].capital += rent;
-
     totalRentPaid += rent;
 
     if (!rentDistribution[ownerIdx]) {
@@ -1173,16 +1170,31 @@ shares.forEach(ownerIdx => {
   // 2️⃣ Si loyer payé → afficher modal puis continuer
   if (totalRentPaid > 0) {
 
-    window.openModal("💸 LOYER PAYÉ", `
-      <p style="font-size:1.6rem">
-        Vous avez payé <b>${totalRentPaid}€</b>.
-      </p>
-      <button class="btn-action"
-        style="background:var(--vert)"
-        onclick="window.afterRent(${idx}, ${pos})">
-        CONTINUER
-      </button>
-    `);
+  let detailHtml = `
+  <p style="font-size:1.6rem">
+    Vous avez payé <b>${totalRentPaid}€</b>.
+  </p>
+`;
+
+Object.keys(rentDistribution).forEach(ownerIdx => {
+  const amount = rentDistribution[ownerIdx];
+  const team = window.teams[ownerIdx];
+
+  detailHtml += `
+    <div style="font-size:1.3rem;font-weight:700;color:${team.color};margin-top:6px;">
+      ${amount}€ à ${team.name}
+    </div>
+  `;
+});
+
+window.openModal("💸 LOYER PAYÉ", `
+  ${detailHtml}
+  <button class="btn-action"
+    style="background:var(--vert)"
+    onclick="window.afterRent(${idx}, ${pos})">
+    CONTINUER
+  </button>
+`);
 
     return;
   }
