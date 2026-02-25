@@ -1388,7 +1388,7 @@ window.executeBlock = (teamIdx) => {
   window.teams[teamIdx].skipNextTurn = true;
 
   window.openModal("🚫 ÉQUIPE BLOQUÉE",
-    `<p style="font-size:1.8rem;font-weight:900;color:var(--rouge)}">
+    `<p style="font-size:1.8rem;font-weight:900;color:var(--rouge)">
       ${window.teams[teamIdx].name} passera son prochain tour.
     </p>
      <button class="btn-action" onclick="window.nextTurn()">OK</button>`
