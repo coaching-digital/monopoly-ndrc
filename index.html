@@ -1148,14 +1148,25 @@ if (data.name === "DÉPART") {
   let totalRentPaid = 0;
 
   // 1️⃣ Paiement du loyer si parts adverses
-  shares.forEach(ownerIdx => {
-    if (ownerIdx !== idx) {
-      const rent = Math.floor(price * 0.30);
-      window.teams[idx].capital -= rent;
-      window.teams[ownerIdx].capital += rent;
-      totalRentPaid += rent;
+ const rentDistribution = {};
+
+shares.forEach(ownerIdx => {
+  if (ownerIdx !== idx) {
+
+    const rent = Math.floor(price * 0.30);
+
+    window.teams[idx].capital -= rent;
+    window.teams[ownerIdx].capital += rent;
+
+    totalRentPaid += rent;
+
+    if (!rentDistribution[ownerIdx]) {
+      rentDistribution[ownerIdx] = 0;
     }
-  });
+
+    rentDistribution[ownerIdx] += rent;
+  }
+});
 
   window.updateUI();
 
