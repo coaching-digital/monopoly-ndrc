@@ -1145,14 +1145,9 @@ if (data.name === "DÉPART") {
   const shares = window.corporateShares[pos];
   const price = boardData[pos].price;
 
-  // Aucune part vendue → achat classique
-  if (shares.length === 0) {
-    window.triggerInvest(idx, pos);
-    return;
-  }
-
   let totalRentPaid = 0;
 
+  // 1️⃣ Paiement du loyer si parts adverses
   shares.forEach(ownerIdx => {
     if (ownerIdx !== idx) {
       const rent = Math.floor(price * 0.30);
@@ -1164,38 +1159,77 @@ if (data.name === "DÉPART") {
 
   window.updateUI();
 
-  const myShares = shares.filter(x => x === idx).length;
-  const otherTeams = [...new Set(shares.filter(x => x !== idx))];
+  // 2️⃣ Si loyer payé → afficher modal puis continuer
+  if (totalRentPaid > 0) {
 
-  if (myShares >= 1 && otherTeams.length >= 1) {
     window.openModal("💸 LOYER PAYÉ", `
       <p style="font-size:1.6rem">
-        Vous avez payé <b>${totalRentPaid}€</b> de loyer.
+        Vous avez payé <b>${totalRentPaid}€</b>.
       </p>
       <button class="btn-action"
-              style="background:var(--vert)"
-              onclick="window.closeModal()">
+        style="background:var(--vert)"
+        onclick="window.afterRent(${idx}, ${pos})">
         CONTINUER
       </button>
     `);
+
     return;
   }
 
-  window.openModal("💸 LOYER PAYÉ", `
-    <p style="font-size:1.6rem">
-      Vous avez payé <b>${totalRentPaid}€</b> de loyer.
-    </p>
-    <button class="btn-action"
-            style="background:#64748b"
-            onclick="window.nextTurn()">
-      OK
-    </button>
-  `);
+  // Sinon continuer directement
+  window.afterRent(idx, pos);
 }
 
 } else {
   window.nextTurn();
 }
+};
+  window.afterRent = (idx, pos) => {
+
+  const shares = window.corporateShares[pos];
+  const myShares = shares.filter(x => x === idx).length;
+  const otherTeams = [...new Set(shares.filter(x => x !== idx))];
+
+  // 3️⃣ S’il reste des parts → achat classique
+  if (shares.length < 3) {
+    window.triggerInvest(idx, pos);
+    return;
+  }
+
+  // 4️⃣ Toutes les parts vendues → OPA si je possède une part
+  if (myShares >= 1 && otherTeams.length >= 1) {
+
+    let html = `
+      <p style="font-size:1.6rem">
+        Toutes les parts sont vendues.<br>
+        Vous pouvez lancer une OPA.
+      </p>
+    `;
+
+    otherTeams.forEach(t => {
+      html += `
+        <button class="btn-action"
+          style="background:${window.teams[t].color}"
+          onclick="window.negoStep1(${idx}, ${pos}, ${t})">
+          Attaquer ${window.teams[t].name}
+        </button>
+      `;
+    });
+
+    html += `
+      <button class="btn-action"
+        style="background:#64748b"
+        onclick="window.nextTurn()">
+        Fin du tour
+      </button>
+    `;
+
+    window.openModal("🤝 OPA POSSIBLE", html);
+    return;
+  }
+
+  // Sinon fin du tour
+  window.nextTurn();
 };
   window.triggerChance = (idx) => {
     const student = getRandomStudent(idx);
