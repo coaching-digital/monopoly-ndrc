@@ -1502,21 +1502,7 @@ window.updateUI();
 window.triggerInvest = (idx, pos) => {
   window.buyShareQuiz(idx, pos);
 };
-  const student = getRandomStudent(idx);
-  window.lastStudent = student.toUpperCase();
 
-  window.openModal("🧠 QUESTION AVANT ACHAT",
-    `<p style="font-size:1.5rem">La question est pour :</p>
-     <div class="student-badge"
-          style="background: var(--${window.teams[idx].name.toLowerCase()})">
-        👉 ${student}
-     </div>
-     <button class="btn-action"
-             style="background:var(--vert)"
-             onclick="window.buyShareQuiz(${idx}, ${pos})">
-        JE SUIS PRÊT(E) ➤
-     </button>`
-  );
 
   window.buyShare = (idx, pos) => {
   if (window.teams[idx].capital >= boardData[pos].price) {
