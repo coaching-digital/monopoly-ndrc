@@ -241,21 +241,25 @@ textarea {
 debtInstallment: 0,
 hasUsedCredit: false,
 eliminated: false,
+     skipNextTurn: false,
  },
     { name: "Bleu", color: "#3b82f6", pos: 0, capital: 10000, prison: 0, players: [], debt: 0,
 debtInstallment: 0,
 hasUsedCredit: false,
 eliminated: false,
+     skipNextTurn: false,
 },
     { name: "Vert", color: "#22c55e", pos: 0, capital: 10000, prison: 0, players: [],  debt: 0,
 debtInstallment: 0,
 hasUsedCredit: false,
 eliminated: false,
+     skipNextTurn: false,
  },
     { name: "Jaune", color: "#f1c40f", pos: 0, capital: 10000, prison: 0, players: [], debt: 0,
 debtInstallment: 0,
 hasUsedCredit: false,
 eliminated: false,
+     skipNextTurn: false,
 }
   ];
   // 📊 Statistiques pédagogiques
@@ -1170,8 +1174,94 @@ if (s && window.studentStats[s]) {
   }
 }
     clearInterval(window.questionTimer);
-    if (success) window.openModal("BRAVO ! 👏", `<div style="font-size:2.5rem;font-weight:900;color:var(--vert)">RÉPONSE JUSTE !</div><p>Relancez le dé immédiatement.</p><button class="btn-action" style="background:var(--vert)" onclick="window.closeModal()">RELANCER</button>`);
-else {
+if (success) {
+
+  const rewards = [
+    { type: "money", val: 500, label: "Vous remportez 500€" },
+    { type: "loan", val: 1000, label: "Prêt sans intérêt de 1000€" },
+    { type: "steal", val: 200, label: "Volez 200€ à une équipe" },
+    { type: "reroll", label: "Relancez le dé" },
+    { type: "block", label: "Bloquez une équipe pour 1 tour" }
+  ];
+
+  const reward = rewards[Math.floor(Math.random() * rewards.length)];
+
+  if (reward.type === "money") {
+    window.teams[idx].capital += reward.val;
+
+    window.openModal("🍀 CARTE CHANCE",
+      `<div style="font-size:2rem;font-weight:900;color:var(--vert)">
+        ${reward.label}
+       </div>
+       <div style="font-size:4rem;font-weight:900;">
+         +${reward.val}€
+       </div>
+       <button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">OK</button>`
+    );
+  }
+
+  else if (reward.type === "loan") {
+    window.teams[idx].capital += reward.val;
+
+    window.openModal("🍀 CARTE CHANCE",
+      `<div style="font-size:2rem;font-weight:900;color:#0ea5e9">
+        ${reward.label}
+       </div>
+       <div style="font-size:4rem;font-weight:900;">
+         +${reward.val}€
+       </div>
+       <button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">OK</button>`
+    );
+  }
+
+  else if (reward.type === "steal") {
+
+    let html = `<p style="font-size:1.6rem">Choisissez une équipe :</p>`;
+
+    window.teams.forEach((t, i) => {
+      if (i !== idx && !t.eliminated) {
+        html += `
+          <button class="btn-action"
+                  style="background:${t.color}"
+                  onclick="window.executeSteal(${idx}, ${i}, ${reward.val})">
+            ${t.name}
+          </button>`;
+      }
+    });
+
+    window.openModal("🕵️ VOL", html);
+  }
+
+  else if (reward.type === "reroll") {
+    window.openModal("🎲 RELANCE",
+      `<div style="font-size:2rem;font-weight:900;color:var(--vert)">
+        ${reward.label}
+       </div>
+       <button class="btn-action" style="background:var(--vert)" onclick="window.closeModal()">RELANCER</button>`
+    );
+  }
+
+  else if (reward.type === "block") {
+
+    let html = `<p style="font-size:1.6rem">Qui voulez-vous bloquer ?</p>`;
+
+    window.teams.forEach((t, i) => {
+      if (i !== idx && !t.eliminated) {
+        html += `
+          <button class="btn-action"
+                  style="background:${t.color}"
+                  onclick="window.executeBlock(${i})">
+            ${t.name}
+          </button>`;
+      }
+    });
+
+    window.openModal("🚫 BLOCAGE", html);
+  }
+
+  return;
+}
+    else {
 
   const malusCards = [
     { m: "Amende URSSAF", val: -200 },
