@@ -1202,9 +1202,9 @@ window.teams.forEach((t, i) => { if(i !== idx && t.capital > 0) h += `<button cl
   };
 
   window.msStep2 = (att, def, p) => {
-    const student = getRandomStudent(att);
+const student = getRandomStudent(def);
     window.lastStudent = student.toUpperCase();
-    window.openModal("⚠️ DÉFI", `<p style="font-size:1.5rem">L'attaque est menée par :</p><div class="student-badge">👉 ${student}</div><button class="btn-action" style="background:var(--rouge)" onclick="window.launchMs(${att}, ${def}, ${p})">LANCER ➤</button>`);
+    window.openModal("⚠️ DÉFI", `<p style="font-size:1.5rem">L'équipe ${window.teams[def].name} doit se défendre :</p><div class="student-badge">👉 ${student}</div><button class="btn-action" style="background:var(--rouge)" onclick="window.launchMs(${att}, ${def}, ${p})">LANCER ➤</button>`);
   };
 
   window.launchMs = (att, def, p) => {
@@ -1230,7 +1230,7 @@ if (window.lastStudent && window.studentStats[window.lastStudent]) {
     }
 }
     clearInterval(window.questionTimer);
-    const amount = Math.floor(window.teams[att].capital * p);
+const amount = Math.floor(window.teams[def].capital * p);
     if(success) {
       window.teams[def].capital -= amount; window.teams[att].capital += amount;
       document.getElementById('modal-body').innerHTML = `<div style="font-size:2.5rem;font-weight:900;color:var(--vert)">DÉFI RÉUSSI !</div><div style="font-size:4rem;font-weight:900;">+${amount}€</div><button class="btn-action" onclick="window.nextTurn()">OK</button>`;
