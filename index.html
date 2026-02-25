@@ -1499,8 +1499,9 @@ window.updateUI();
 }
   };
 
-  window.triggerInvest = (idx, pos, justBought=false) => {
-
+window.triggerInvest = (idx, pos) => {
+  window.buyShareQuiz(idx, pos);
+};
   const student = getRandomStudent(idx);
   window.lastStudent = student.toUpperCase();
 
