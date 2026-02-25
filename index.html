@@ -1598,6 +1598,7 @@ if (s && window.studentStats[s]) {
   }
 }
   clearInterval(window.questionTimer);
+  window.questionTimer = null;
 
   if (!success) {
     window.openModal(
