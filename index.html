@@ -1295,6 +1295,32 @@ if (success) {
   );
 }
   };
+  window.executeSteal = (att, def, amount) => {
+  const realAmount = Math.min(amount, window.teams[def].capital);
+
+  window.teams[def].capital -= realAmount;
+  window.teams[att].capital += realAmount;
+
+  window.updateUI();
+
+  window.openModal("💰 VOL RÉUSSI",
+    `<div style="font-size:2rem;font-weight:900;color:var(--vert)">
+      +${realAmount}€
+     </div>
+     <button class="btn-action" onclick="window.nextTurn()">OK</button>`
+  );
+};
+
+window.executeBlock = (teamIdx) => {
+  window.teams[teamIdx].skipNextTurn = true;
+
+  window.openModal("🚫 ÉQUIPE BLOQUÉE",
+    `<p style="font-size:1.8rem;font-weight:900;color:var(--rouge)}">
+      ${window.teams[teamIdx].name} passera son prochain tour.
+    </p>
+     <button class="btn-action" onclick="window.nextTurn()">OK</button>`
+  );
+};
 
   window.triggerMS = (idx, p) => {
     if (window.teams[idx].capital <= 0) {
@@ -1706,6 +1732,18 @@ while (window.teams[window.currentTurn].eliminated) {
 }
 
 const team = window.teams[window.currentTurn];
+
+  if (team.skipNextTurn) {
+  team.skipNextTurn = false;
+
+  window.openModal("🚫 TOUR BLOQUÉ",
+    `<p style="font-size:1.6rem">
+      ${team.name} est bloquée et passe son tour.
+    </p>
+     <button class="btn-action" onclick="window.nextTurn()">OK</button>`
+  );
+  return;
+}
 
 
 if (team.debt > 0) {
