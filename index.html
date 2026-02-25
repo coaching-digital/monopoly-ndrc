@@ -1518,16 +1518,11 @@ window.triggerInvest = (idx, pos) => {
      </button>`
   );
 };
-
   window.buyShare = (idx, pos) => {
-
   if (window.teams[idx].capital >= boardData[pos].price) {
-
     window.teams[idx].capital -= boardData[pos].price;
     window.corporateShares[pos].push(idx);
-
     window.updateUI();
-
     window.openModal(
       "🏢 PART ACHETÉE",
       `<p style="font-size:1.6rem">
@@ -1539,15 +1534,11 @@ window.triggerInvest = (idx, pos) => {
         OK
       </button>`
     );
-
   } else {
-
     alert("Fonds insuffisants");
     window.nextTurn();
-
   }
 };
-  };
     // ============================================================
 // ACHAT CLASSIQUE : question obligatoire avant achat
 // ============================================================
