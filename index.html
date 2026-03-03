@@ -1949,7 +1949,7 @@ window.negoStep3 = (att, def, pos) => {
   window.openModal(
     "⚠️ DÉFENSE",
     `<p style="font-size:1.8rem">La défense pour l'équipe ${window.teams[def].name} :</p>
-<div class="student-badge" style="background:${window.teams[idx].color}">
+<div class="student-badge" style="background:${window.teams[def].color}">
 👉 ${student}
 </div>
      <button class="btn-action" style="background:var(--vert)" onclick="window.launchNego3(${att}, ${def}, ${pos}, ${amt})">PRÊT ➤</button>`
