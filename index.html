@@ -1870,12 +1870,23 @@ window.buyShareAfterQuiz = (idx, pos) => {
   const student = getRandomStudent(att);
     window.lastStudent = student.toUpperCase();
 
-  window.openModal(
-    "⚠️ OPA",
-    `<p style="font-size:1.8rem">L'offre sera faite par :</p>
-<div class="student-badge" style="background:${window.teams[att].color}">
-     <button class="btn-action" style="background:var(--vert)" onclick="window.launchNego1(${att}, ${def}, ${pos})">PRÊT ➤</button>`
-  );
+    window.openModal(
+  "⚠️ OPA",
+  `<p style="font-size:1.8rem;margin-bottom:25px;">
+     L'offre sera faite par :
+   </p>
+
+   <div class="student-badge"
+        style="background:${window.teams[att].color}">
+     👉 ${student}
+   </div>
+
+   <button class="btn-action"
+           style="background:var(--vert)"
+           onclick="window.launchNego1(${att}, ${def}, ${pos})">
+     PRÊT ➤
+   </button>`
+);
 };
 
 window.launchNego1 = (att, def, pos) => {
