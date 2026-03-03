@@ -1206,12 +1206,15 @@ window.openModal("💸 LOYER PAYÉ", `
   window.nextTurn();
 }
 };
-  window.stealShareStep2 = (attackerIdx, targetIdx) => {
+window.stealShareStep2 = (attackerIdx, targetIdx) => {
 
   let html = `<p style="font-size:1.6rem">Choisissez la part à voler :</p>`;
 
+  let found = false;
+
   window.corporateShares.forEach((owners, pos) => {
     if (owners.includes(targetIdx)) {
+      found = true;
       html += `
         <button class="btn-action"
                 style="background:#64748b"
@@ -1221,26 +1224,65 @@ window.openModal("💸 LOYER PAYÉ", `
     }
   });
 
+  // 🔥 Si aucune part trouvée
+  if (!found) {
+    html += `
+      <p style="font-size:1.4rem;margin-top:20px;color:#64748b;">
+        Cette équipe ne possède aucune part.
+      </p>
+      <button class="btn-action"
+              style="background:#64748b"
+              onclick="window.nextTurn()">
+        OK
+      </button>
+    `;
+  }
+
   window.openModal("🏢 CHOIX DE LA PART", html);
 };
-  window.stealShareDefense = (attackerIdx, targetIdx, pos) => {
+
+  window.openModal("🏢 CHOIX DE LA PART", html);
+};
+window.stealShareDefense = (attackerIdx, targetIdx, pos) => {
+
+  const student = getRandomStudent(targetIdx);
+  window.lastStudent = student.toUpperCase();
 
   const q = ensureQuestionOrPrompt();
   if (!q) return;
 
-  window.openModal("🛡️ DÉFENSE", `
+  window.openModal("🛡️ DÉFENSE - VOL DE PART", `
+    <p style="font-size:1.4rem;margin-bottom:10px;">
+      L'équipe <b style="color:${window.teams[targetIdx].color}">
+      ${window.teams[targetIdx].name}
+      </b> doit se défendre :
+    </p>
+
+    <div class="student-badge" 
+         style="background:${window.teams[targetIdx].color}">
+      👉 ${student}
+    </div>
+
+    <div id="timer-val" class="timer-box">30s</div>
+
     <div class="quiz-box">${q}</div>
+
     <button class="btn-action"
             style="background:var(--vert)"
             onclick="window.resolveStealShare(${attackerIdx}, ${targetIdx}, ${pos}, true)">
-      JUSTE
+      JUSTE ✅
     </button>
+
     <button class="btn-action"
             style="background:var(--rouge)"
             onclick="window.resolveStealShare(${attackerIdx}, ${targetIdx}, ${pos}, false)">
-      FAUX
+      FAUX ❌
     </button>
   `);
+
+  window.startQTimer(30, () => 
+    window.resolveStealShare(attackerIdx, targetIdx, pos, false)
+  );
 };
   window.resolveStealShare = (attackerIdx, targetIdx, pos, success) => {
 
