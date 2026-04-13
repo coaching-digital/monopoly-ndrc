@@ -1137,28 +1137,37 @@ if (data.name === "DÉPART") {
 
 } else if (data.type === 'commu') {
 
-  const cards = [
-    { m: "Aide de l'État", val: 200 },
-    { m: "Dividendes (15%)", val: 300 },
-    { m: "Amende URSSAF", val: -200 },
-    { m: "Taxes", val: -100 }
-  ];
+  const q = getCommuQuestion();
 
-  const c = cards[Math.floor(Math.random() * cards.length)];
-
-  team.capital += c.val;
-  if (c.val < 0) window.communityPot += Math.abs(c.val);
+  if (!q) {
+    window.openModal(
+      "⚠️ COMMUNAUTÉ",
+      `<p style="font-size:1.5rem">Aucune question disponible.</p>
+       <button class="btn-action" onclick="window.nextTurn()">OK</button>`
+    );
+    return;
+  }
 
   window.openModal(
-    "COMMUNAUTÉ",
-    `<div style="font-size:2rem;font-weight:900;color:${c.val>0?'var(--vert)':'var(--rouge)'}">
-       ${c.m}
-     </div>
-     <div style="font-size:4rem;font-weight:900;">
-       ${c.val>0?'+':''}${c.val}€
-     </div>
-     <button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">OK</button>`
+    "🤝 QUESTION COMMUNAUTÉ",
+    `<div id="timer-val" class="timer-box">30s</div>
+     <div class="quiz-box">${q}</div>
+
+     <button class="btn-action"
+       style="background:var(--vert)"
+       onclick="window.resolveCommu(${idx}, true)">
+       JUSTE ✅
+     </button>
+
+     <button class="btn-action"
+       style="background:var(--rouge)"
+       onclick="window.resolveCommu(${idx}, false)">
+       FAUX ❌
+     </button>`
   );
+
+  window.startQTimer(30, () => window.resolveCommu(idx, false));
+}
 
 } else if (data.type === 'ms') {
   window.triggerMS(idx, data.val);
