@@ -323,6 +323,12 @@ window.teams.forEach(team => {
   let availableQuestions = [];
   let questionsReady = false;
 
+  // 📘 Questions COMMUNAUTÉ (calculs)
+let COMMU_CSV_URL = "./calculs-ndrc.csv";
+let commuQuestionBank = [];
+let commuAvailableQuestions = [];
+let commuReady = false;
+  
   function parseCsvOneColumn(text) {
     const lines = (text || "").split(/\r?\n/).filter(l => l.trim() !== "");
     if (lines.length === 0) return [];
@@ -347,6 +353,27 @@ window.teams.forEach(team => {
     return qs;
   }
 
+  async function loadCommuQuestions() {
+  try {
+    const url = `${COMMU_CSV_URL}?v=${Date.now()}`;
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const text = await res.text();
+    const qs = parseCsvOneColumn(text);
+
+    if (!qs.length) throw new Error("CSV communauté vide");
+
+    commuQuestionBank = qs;
+    commuAvailableQuestions = [...qs];
+    commuReady = true;
+
+  } catch (e) {
+    commuReady = false;
+    console.warn("Erreur chargement COMMU CSV", e);
+  }
+}
+  
   function rebuildBag() {
     availableQuestions = [...questionBank];
   }
