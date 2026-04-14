@@ -1326,10 +1326,13 @@ const teamColor = window.teams[attackerIdx].color;
 const dots = `<span style="color:${teamColor}; font-weight:900;">
   ${"●".repeat(mySharesCount)}
 </span>`;
+      const highlightStyle = mySharesCount > 0
+  ? `border:3px solid ${teamColor}; box-shadow:0 0 10px ${teamColor};`
+  : ``;
 
 html += `
   <button class="btn-action"
-          style="background:#64748b"
+style="background:#64748b; ${highlightStyle}"
           onclick="window.stealShareDefense(${attackerIdx}, ${targetIdx}, ${pos})">
 
     <div style="display:flex;justify-content:space-between;align-items:center;">
