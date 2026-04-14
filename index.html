@@ -301,6 +301,12 @@ window.studentBags = {};
       const names = document.getElementById(id).value.split(',').map(n => n.trim()).filter(n => n !== "");
       window.teams[idx].players = names.length > 0 ? names : [`Équipe ${window.teams[idx].name}`];
     });
+    // Désactiver les équipes non utilisées
+window.teams.forEach((team, idx) => {
+  if (idx >= window.nbTeams) {
+    team.eliminated = true;
+  }
+});
 
     // On garde l'écran joueurs tel quel, puis on affiche l'écran de thème
     document.getElementById('setup-overlay').style.display = 'none';
@@ -2167,8 +2173,8 @@ window.negoStep3 = (att, def, pos) => {
   };
 
   window.updateUI = () => {
-    document.getElementById('team-status-container').innerHTML = window.teams.map((t, i) =>
-      `<div class="team-card ${i === window.currentTurn ? 'active' : ''} ${t.prison > 0 ? 'jail' : ''}" style="border-left-color:${t.color}">
+document.getElementById('team-status-container').innerHTML = window.teams.filter(t => !t.eliminated).map((t, i) =>
+    `<div class="team-card ${i === window.currentTurn ? 'active' : ''} ${t.prison > 0 ? 'jail' : ''}" style="border-left-color:${t.color}">
         <b>${t.name}</b><br>
         <span class="team-cap">${t.capital}€</span>
         ${i === window.currentTurn ? `<button class="btn-roll" onclick="window.rollDice(${i})">🎲 Lancer le dé</button>` : ''}
