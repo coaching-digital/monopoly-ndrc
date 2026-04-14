@@ -1318,12 +1318,26 @@ window.stealShareStep2 = (attackerIdx, targetIdx) => {
   window.corporateShares.forEach((owners, pos) => {
     if (owners.includes(targetIdx)) {
       found = true;
-      html += `
-        <button class="btn-action"
-                style="background:#64748b"
-                onclick="window.stealShareDefense(${attackerIdx}, ${targetIdx}, ${pos})">
-          ${boardData[pos].name}
-        </button>`;
+     const mySharesCount = window.corporateShares[pos]
+  .filter(owner => owner === attackerIdx).length;
+
+const teamColor = window.teams[attackerIdx].color;
+
+const dots = `<span style="color:${teamColor}; font-weight:900;">
+  ${"●".repeat(mySharesCount)}
+</span>`;
+
+html += `
+  <button class="btn-action"
+          style="background:#64748b"
+          onclick="window.stealShareDefense(${attackerIdx}, ${targetIdx}, ${pos})">
+
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span>${boardData[pos].name}</span>
+      <span>${mySharesCount > 0 ? dots : ""}</span>
+    </div>
+
+  </button>`;
     }
   });
 
