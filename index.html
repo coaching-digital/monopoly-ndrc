@@ -1221,21 +1221,23 @@ if (data.name === "DÉPART") {
      <div id="timer-val" class="timer-box">30s</div>
      <div class="quiz-box">${q}</div>
 
-     <button class="btn-action"
-       style="background:var(--vert)"
+html += `
+<button class="btn-action"
+    style="background:var(--vert)"
        onclick="window.resolveCommu(${idx}, true)">
        JUSTE ✅
      </button>
 
-     <button class="btn-action"
-       style="background:var(--rouge)"
-       onclick="window.resolveCommu(${idx}, false)">
-       FAUX ❌
-     </button>`
-  );
+  <button class="btn-action"
+style="background:var(--rouge)"
+onclick="window.resolveCommu(${idx}, false)">
+FAUX ❌
+</button>
+      `;
 
-  window.startQTimer(30, () => 
-   window.resolveCommu = (idx, success) => {
+
+window.startQTimer(30, () => window.resolveCommu(idx, false));
+      window.resolveCommu = (idx, success) => {
   clearInterval(window.questionTimer);
 
   // ✅ BONNE RÉPONSE → logique normale
