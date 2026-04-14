@@ -202,27 +202,29 @@ textarea {
 <div id="setup-overlay" class="hidden">
   <div class="setup-container">
     <h1 style="color:#FFFFFF; margin-top:0; font-size:3rem;">MONOPOLY NDRC</h1>
-    <div style="text-align:left; display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-     <div>
-  <label style="color:#ef4444; font-size:1.8rem; font-weight:900;">🟥 ROUGE</label>
-  <textarea id="input-rouge" style="width:100%;height:60px;"></textarea>
-</div>
+ <div style="text-align:left; display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
 
-<div>
-  <label style="color:#3b82f6; font-size:1.8rem; font-weight:900;">🟦 BLEUE</label>
-  <textarea id="input-bleu" style="width:100%;height:60px;"></textarea>
-</div>
+  <div id="team-rouge">
+    <label style="color:#ef4444; font-size:1.8rem; font-weight:900;">🟥 ROUGE</label>
+    <textarea id="input-rouge" style="width:100%;height:60px;"></textarea>
+  </div>
 
-<div>
-  <label style="color:#22c55e; font-size:1.8rem; font-weight:900;">🟩 VERTE</label>
-  <textarea id="input-vert" style="width:100%;height:60px;"></textarea>
-</div>
+  <div id="team-bleu">
+    <label style="color:#3b82f6; font-size:1.8rem; font-weight:900;">🟦 BLEUE</label>
+    <textarea id="input-bleu" style="width:100%;height:60px;"></textarea>
+  </div>
 
-<div>
-  <label style="color:#f1c40f; font-size:1.8rem; font-weight:900;">🟨 JAUNE</label>
-  <textarea id="input-jaune" style="width:100%;height:60px;"></textarea>
+  <div id="team-vert">
+    <label style="color:#22c55e; font-size:1.8rem; font-weight:900;">🟩 VERTE</label>
+    <textarea id="input-vert" style="width:100%;height:60px;"></textarea>
+  </div>
+
+  <div id="team-jaune">
+    <label style="color:#f1c40f; font-size:1.8rem; font-weight:900;">🟨 JAUNE</label>
+    <textarea id="input-jaune" style="width:100%;height:60px;"></textarea>
+  </div>
+
 </div>
-      </div>
     <button onclick="window.initGame()" style="background:#22c55e; color:white; padding:15px 50px; font-size:1.8rem; font-weight:900; border-radius:50px; cursor:pointer; margin-top:25px; border:none;">C'EST PARTI ! 🚀</button>
   </div>
 </div>
