@@ -1234,8 +1234,19 @@ if (data.name === "DÉPART") {
      </button>`
   );
 
-  window.startQTimer(30, () => window.resolveCommu(idx, false));
-}
+  window.startQTimer(30, () => 
+   window.resolveCommu = (idx, success) => {
+  clearInterval(window.questionTimer);
+
+  // ✅ BONNE RÉPONSE → logique normale
+  if (success) {
+    window.resolveChance(idx, true);
+    return;
+  }
+
+  // ❌ MAUVAISE RÉPONSE → vol possible
+  window.triggerStealAnswerCommu(idx);
+};
       else if (data.type === 'ms') {
   window.triggerMS(idx, data.val);
 
@@ -1964,6 +1975,40 @@ if (s && window.studentStats[s]) {
 
   return;
 }
+  window.triggerStealAnswerCommu = (failedTeamIdx) => {
+
+  let html = `
+    <p style="font-size:1.6rem;margin-bottom:20px;">
+      ❌ Mauvaise réponse !<br>
+      Les autres équipes peuvent répondre :
+    </p>
+  `;
+
+  window.teams.forEach((team, idx) => {
+    if (idx !== failedTeamIdx && !team.eliminated) {
+
+      const student = getRandomStudent(idx);
+
+      html += `
+        <button class="btn-action"
+                style="background:${team.color}"
+                onclick="window.stealAnswerCommuSuccess(${idx})">
+          ${team.name} — ${student}
+        </button>
+      `;
+    }
+  });
+
+  html += `
+    <button class="btn-action"
+            style="background:#64748b;margin-top:25px;"
+            onclick="window.nextTurn()">
+      Aucune équipe ne répond
+    </button>
+  `;
+
+  window.openModal("🎯 VOL DE RÉPONSE", html);
+};
 
   // Succès -> on propose l'achat (on re-vérifie au cas où)
   const price = boardData[pos].price;
