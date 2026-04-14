@@ -373,6 +373,18 @@ let commuReady = false;
     console.warn("Erreur chargement COMMU CSV", e);
   }
 }
+  function getCommuQuestion() {
+  if (!commuReady || commuQuestionBank.length === 0) return null;
+
+  if (commuAvailableQuestions.length === 0) {
+    commuAvailableQuestions = [...commuQuestionBank];
+  }
+
+  return commuAvailableQuestions.splice(
+    Math.floor(Math.random() * commuAvailableQuestions.length),
+    1
+  )[0];
+}
   
   function rebuildBag() {
     availableQuestions = [...questionBank];
@@ -1137,6 +1149,9 @@ if (data.name === "DÉPART") {
 
 } else if (data.type === 'commu') {
 
+  const student = getRandomStudent(idx);
+  window.lastStudent = student.toUpperCase();
+
   const q = getCommuQuestion();
 
   if (!q) {
@@ -1150,7 +1165,13 @@ if (data.name === "DÉPART") {
 
   window.openModal(
     "🤝 QUESTION COMMUNAUTÉ",
-    `<div id="timer-val" class="timer-box">30s</div>
+    `<p style="font-size:1.5rem">La question est pour :</p>
+
+     <div class="student-badge" style="background:${window.teams[idx].color}">
+       👉 ${student}
+     </div>
+
+     <div id="timer-val" class="timer-box">30s</div>
      <div class="quiz-box">${q}</div>
 
      <button class="btn-action"
@@ -1167,8 +1188,8 @@ if (data.name === "DÉPART") {
   );
 
   window.startQTimer(30, () => window.resolveCommu(idx, false));
-
-} else if (data.type === 'ms') {
+}
+      else if (data.type === 'ms') {
   window.triggerMS(idx, data.val);
 
 } else if (data.type === 'chance') {
@@ -1648,6 +1669,12 @@ const rewards = [
   );
 }
   };
+  window.resolveCommu = (idx, success) => {
+  clearInterval(window.questionTimer);
+
+  // on réutilise EXACTEMENT la logique CHANCE
+  window.resolveChance(idx, success);
+};
   window.executeSteal = (att, def, amount) => {
   const realAmount = Math.min(amount, window.teams[def].capital);
 
