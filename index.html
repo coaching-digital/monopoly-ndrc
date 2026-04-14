@@ -1964,6 +1964,41 @@ window.triggerStealAnswer = (currentTeamIdx, pos, questionText) => {
   window.openModal("🎯 VOL DE RÉPONSE", html);
 };
 
+  window.stealAnswerSuccess = (teamIdx, pos) => {
+
+  const price = boardData[pos].price;
+
+  // Vérification argent
+  if (window.teams[teamIdx].capital < price) {
+    window.openModal(
+      "⛔ ACHAT IMPOSSIBLE",
+      `<p style="font-size:1.5rem">
+        ${window.teams[teamIdx].name} n'a pas assez de capital pour acheter.
+      </p>
+      <button class="btn-action" onclick="window.nextTurn()">OK</button>`
+    );
+    return;
+  }
+
+  window.openModal(
+    "🎯 VOL RÉUSSI",
+    `<p style="font-size:1.6rem">
+      ${window.teams[teamIdx].name} récupère le droit d'acheter la part !
+    </p>
+
+    <button class="btn-action"
+      style="background:var(--vert)"
+      onclick="window.buyShareAfterQuiz(${teamIdx}, ${pos})">
+      ACHETER LA PART
+    </button>
+
+    <button class="btn-action"
+      style="background:#64748b"
+      onclick="window.nextTurn()">
+      Refuser
+    </button>`
+  );
+};
 
   window.negoStep1 = (att, pos, def) => {
   const student = getRandomStudent(att);
