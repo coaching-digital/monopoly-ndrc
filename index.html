@@ -162,8 +162,35 @@ textarea {
 </style>
   </head>
 <body>
+<!-- NOUVEL ECRAN : CHOIX NOMBRE D'EQUIPES -->
+<div id="team-select-overlay">
+  <div class="setup-container">
+    <h1 style="font-size:2.5rem;">Choisir le nombre d’équipes</h1>
 
-<div id="setup-overlay">
+    <div style="display:flex;flex-direction:column;gap:15px;margin-top:20px;">
+
+      <button class="btn-action"
+        style="background:#3b82f6"
+        onclick="window.selectNbTeams(2)">
+        2 ÉQUIPES
+      </button>
+
+      <button class="btn-action"
+        style="background:#22c55e"
+        onclick="window.selectNbTeams(3)">
+        3 ÉQUIPES
+      </button>
+
+      <button class="btn-action"
+        style="background:#f1c40f; color:#333"
+        onclick="window.selectNbTeams(4)">
+        4 ÉQUIPES
+      </button>
+
+    </div>
+  </div>
+</div>
+<div id="setup-overlay" class="hidden">
   <div class="setup-container">
     <h1 style="color:#FFFFFF; margin-top:0; font-size:3rem;">MONOPOLY NDRC</h1>
     <div style="text-align:left; display:grid; grid-template-columns: 1fr 1fr; gap: 15px;">
@@ -237,6 +264,7 @@ textarea {
 
 <script>
   window.teams = [
+    window.nbTeams = 4;
     { name: "Rouge", color: "#ef4444", pos: 0, capital: 10000, prison: 0, players: [], debt: 0,
 debtInstallment: 0,
 hasUsedCredit: false,
@@ -2022,7 +2050,12 @@ window.triggerStealAnswer = (currentTeamIdx, pos, questionText) => {
    </button>`
 );
 };
+window.selectNbTeams = (nb) => {
+  window.nbTeams = nb;
 
+  document.getElementById('team-select-overlay').classList.add('hidden');
+  document.getElementById('setup-overlay').classList.remove('hidden');
+};
 window.launchNego1 = (att, def, pos) => {
   const q = ensureQuestionOrPrompt();
   if (!q) return;
