@@ -1894,14 +1894,13 @@ if (s && window.studentStats[s]) {
   clearInterval(window.questionTimer);
   window.questionTimer = null;
 
-  if (!success) {
-    window.openModal(
-      "❌ MAUVAISE RÉPONSE",
-      `<p style="font-size:1.8rem;font-weight:900;color:var(--rouge)">Fin du tour.</p>
-       <button class="btn-action" style="background:#64748b" onclick="window.nextTurn()">OK</button>`
-    );
-    return;
-  }
+ if (!success) {
+  const questionText = document.querySelector(".quiz-box")?.innerText || "Question indisponible";
+
+  window.triggerStealAnswer(idx, pos, questionText);
+
+  return;
+}
 
   // Succès -> on propose l'achat (on re-vérifie au cas où)
   const price = boardData[pos].price;
@@ -1925,7 +1924,45 @@ if (s && window.studentStats[s]) {
 window.buyShareAfterQuiz = (idx, pos) => {
   window.buyShare(idx, pos);
 };
+window.triggerStealAnswer = (currentTeamIdx, pos, questionText) => {
 
+  let html = `
+    <p style="font-size:1.6rem;margin-bottom:20px;">
+      ❌ Mauvaise réponse !<br>
+      Les autres équipes peuvent tenter de répondre :
+    </p>
+
+    <div class="quiz-box">${questionText}</div>
+  `;
+
+  // Pour chaque équipe adverse
+  window.teams.forEach((team, idx) => {
+    if (idx !== currentTeamIdx && !team.eliminated) {
+
+      const student = getRandomStudent(idx);
+
+      html += `
+        <div style="margin-top:15px;">
+          <button class="btn-action"
+                  style="background:${team.color}"
+                  onclick="window.stealAnswerSuccess(${idx}, ${pos})">
+            ${team.name} — ${student}
+          </button>
+        </div>
+      `;
+    }
+  });
+
+  html += `
+    <button class="btn-action"
+            style="background:#64748b;margin-top:25px;"
+            onclick="window.nextTurn()">
+      Aucune équipe n'a su répondre
+    </button>
+  `;
+
+  window.openModal("🎯 VOL DE RÉPONSE", html);
+};
 
 
   window.negoStep1 = (att, pos, def) => {
