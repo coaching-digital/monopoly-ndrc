@@ -373,7 +373,7 @@ let commuReady = false;
     console.warn("Erreur chargement COMMU CSV", e);
   }
 }
-  function getCommuQuestion() {
+window.getCommuQuestion = function() {
   if (!commuReady || commuQuestionBank.length === 0) return null;
 
   if (commuAvailableQuestions.length === 0) {
