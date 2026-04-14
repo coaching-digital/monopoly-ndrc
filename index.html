@@ -2107,6 +2107,23 @@ window.triggerStealAnswer = (currentTeamIdx, pos, questionText) => {
     </button>`
   );
 };
+  window.stealAnswerCommuSuccess = (teamIdx) => {
+
+  window.openModal(
+    "🎯 VOL RÉUSSI",
+    `
+    <p style="font-size:1.6rem">
+      ${window.teams[teamIdx].name} récupère l'effet !
+    </p>
+
+    <button class="btn-action"
+      style="background:var(--vert)"
+      onclick="window.resolveChance(${teamIdx}, true)">
+      APPLIQUER
+    </button>
+    `
+  );
+}; 
 
   window.negoStep1 = (att, pos, def) => {
   const student = getRandomStudent(att);
