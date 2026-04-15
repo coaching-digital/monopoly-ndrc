@@ -1218,8 +1218,7 @@ if (data.name === "DÉPART") {
        👉 ${student}
      </div>
 
-    html += `
-<div id="timer-val" class="timer-box">30s</div>
+    <div id="timer-val" class="timer-box">30s</div>
 <div class="quiz-box">${q}</div>
 
 <button class="btn-action"
@@ -1233,7 +1232,7 @@ style="background:var(--rouge)"
 onclick="window.resolveCommu(${idx}, false)">
 FAUX ❌
 </button>
-`;
+
 
 
 window.startQTimer(30, () => window.resolveCommu(idx, false));
