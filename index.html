@@ -1236,18 +1236,7 @@ FAUX ❌
 );
 
 window.startQTimer(30, () => window.resolveCommu(idx, false));
-      window.resolveCommu = (idx, success) => {
-  clearInterval(window.questionTimer);
-
-  // ✅ BONNE RÉPONSE → logique normale
-  if (success) {
-    window.resolveChance(idx, true);
-    return;
-  }
-
-  // ❌ MAUVAISE RÉPONSE → vol possible
-  window.triggerStealAnswerCommu(idx);
-};
+     
       else if (data.type === 'ms') {
   window.triggerMS(idx, data.val);
 
